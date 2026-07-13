@@ -17,12 +17,12 @@
       <div class="nav-system">CapEx Program Control Tower</div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab" data-page="index.html"       onclick="location.href='index.html'">Home</button>
-      <button class="nav-tab active" data-page="executive.html" onclick="location.href='executive.html'">Executive Dashboard</button>
-      <button class="nav-tab" data-page="supply-chain.html" onclick="location.href='supply-chain.html'">Strategic Supply Chain</button>
-      <button class="nav-tab" data-page="execution-risk.html" onclick="location.href='execution-risk.html'">Execution &amp; Risk</button>
-      <button class="nav-tab" data-page="deep-dive.html"   onclick="location.href='deep-dive.html'">Deep Dive</button>
-      <button class="nav-tab" onclick="location.href='sourcing-framework.html'">Sourcing Framework</button>
+      <button class="nav-tab" data-page="index.html"       onclick="go('index.html')">Home</button>
+      <button class="nav-tab active" data-page="executive.html" onclick="go('executive.html')">Executive Dashboard</button>
+      <button class="nav-tab" data-page="supply-chain.html" onclick="go('supply-chain.html')">Strategic Supply Chain</button>
+      <button class="nav-tab" data-page="execution-risk.html" onclick="go('execution-risk.html')">Execution &amp; Risk</button>
+      <button class="nav-tab" data-page="deep-dive.html"   onclick="go('deep-dive.html')">Deep Dive</button>
+      <button class="nav-tab" onclick="go('sourcing-framework.html')">Sourcing Framework</button>
     </div>
     <div class="nav-actions">
       <button class="nav-btn">Export</button>
@@ -35,57 +35,15 @@
 
   <header class="exec-header">
     <h1 class="exec-title">Executive Dashboard</h1>
-    <p class="exec-subtitle">Program-level overview of the Greenfield Expansion Phase II capital equipment portfolio. $13.87M equipment and installation across 15 platforms. $537K negotiation savings. 20.4w avg supplier lead time.</p>
-    <div class="exec-meta">
-      <span>Program: Greenfield Expansion Phase II</span>
-      <span>Period: Q2–Q4 2025</span>
-      <span>AR Reference: AR-2025-0082</span>
-      <span>Prepared by: Sourabh Tarodekar</span>
-      <span>Classification: Portfolio Demonstration</span>
-    </div>
+    <p class="exec-subtitle" id="execSubtitle"></p>
+    <div class="exec-meta" id="execMeta"></div>
   </header>
 
-  <!-- KPI ROW — compact single line -->
-  <div class="kpi-grid">
-    <div class="kpi-card navy">
-      <div class="kpi-label">Total CapEx Investment</div>
-      <div class="kpi-value neutral">$13.87M</div>
-      <div class="kpi-context">Equip + install · $16.06M AR total</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Equipment Portfolio Size</div>
-      <div class="kpi-value neutral">15 Platforms</div>
-      <div class="kpi-context">45 total units · 6 categories</div>
-    </div>
-    <div class="kpi-card success">
-      <div class="kpi-label">Annual Production Capacity</div>
-      <div class="kpi-value positive">1,040,253</div>
-      <div class="kpi-context">units/yr · process tools only</div>
-    </div>
-    <div class="kpi-card success">
-      <div class="kpi-label">Portfolio Utilization</div>
-      <div class="kpi-value positive">72.1%</div>
-      <div class="kpi-context">Baseline 750K · surge 86.5%</div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Active OEM Suppliers</div>
-      <div class="kpi-value neutral">15</div>
-      <div class="kpi-context">5 countries · avg 87.3 reliability</div>
-    </div>
-    <div class="kpi-card danger">
-      <div class="kpi-label">Single-Source Risk Count</div>
-      <div class="kpi-value danger">2</div>
-      <div class="kpi-context">Pfeiffer (EQ-002) · Daifuku (EQ-006)</div>
-    </div>
-  </div>
+  <!-- KPI ROW — populated by executive.js from PROGRAMS[active] -->
+  <div class="kpi-grid" id="kpiGrid"></div>
 
   <!-- INSIGHT STRIP -->
-  <div class="insight-strip">
-    <div class="insight-item">Portfolio CapEx <strong>$13.87M</strong> — 4.3% under AR budget of $16.06M. $2.19M contingency &amp; FX reserve available.<span class="i-tag tag-up">Under Budget</span></div>
-    <div class="insight-item">Annual capacity <strong>1,040,253 units/yr</strong> at 72.1% utilisation — 290K headroom above 750K baseline demand.<span class="i-tag tag-up">Healthy</span></div>
-    <div class="insight-item">IRR <strong>14.2%</strong> vs 8% hurdle. Payback 4.2 years. 10-yr NPV $9.52M vs minimum-CapEx alternative.<span class="i-tag tag-up">Exceeds Threshold</span></div>
-    <div class="insight-item">EQ-002 Pfeiffer TMP remains <strong>critical path single-source</strong> — Shimadzu qualification active, target Q3-2025.<span class="i-tag tag-down">Monitor</span></div>
-  </div>
+  <div class="insight-strip" id="insightStrip"></div>
 
   <!-- CHART ROW 1 -->
   <div class="grid grid-2">
@@ -93,191 +51,54 @@
       <div class="card-header">
         <div>
           <span class="card-title">CapEx Allocation by Equipment Category</span>
-          <span class="card-insight">High-temp furnaces represent the largest single category at 32.1% of total portfolio value</span>
+          <span class="card-insight" id="donutInsight"></span>
         </div>
-        <span class="card-badge badge-blue">$13.87M Total</span>
+        <span class="card-badge badge-blue" id="donutBadge"></span>
       </div>
       <div class="card-body">
         <div class="chart-wrap"><canvas id="capexDonut"></canvas></div>
-        <div class="legend-row">
-          <span class="l-dot ld-blue">Vacuum Systems (24.2%)</span>
-          <span class="l-dot ld-navy">Furnaces (32.1%)</span>
-          <span class="l-dot ld-green">Robotics (19.4%)</span>
-          <span class="l-dot ld-amber">Gas Handling (9.9%)</span>
-          <span class="l-dot ld-slate">Controls (8.5%)</span>
-          <span class="l-dot ld-gray">Facility Infra (10.8%)</span>
-        </div>
+        <div class="legend-row" id="donutLegend"></div>
       </div>
     </div>
     <div class="card">
       <div class="card-header">
         <div>
-          <span class="card-title">Equipment Deployment Status by Category</span>
-          <span class="card-insight">13 of 15 platforms in production — EQ-004 furnace and EQ-006 conveyor completing qualification</span>
+          <span class="card-title" id="barTitle">Equipment Deployment Status by Category</span>
+          <span class="card-insight" id="barInsight"></span>
         </div>
-        <span class="card-badge badge-green">15 Platforms</span>
+        <span class="card-badge" id="barBadge"></span>
       </div>
       <div class="card-body">
-        <div class="chart-wrap"><canvas id="deployBar"></canvas></div>
-        <div class="legend-row">
-          <span class="l-dot ld-green">In Production</span>
-          <span class="l-dot ld-blue">Qualified / PQ</span>
-          <span class="l-dot ld-amber">Installed</span>
-          <span class="l-dot ld-gray">Ordered</span>
-        </div>
-        <div class="table-fn">Status based on post-commissioning phase gate tracking. "In Production" = G5 gate cleared and formal handover to Operations complete.</div>
+        <div class="chart-wrap"><canvas id="statusBar"></canvas></div>
+        <div class="legend-row" id="barLegend"></div>
+        <div class="table-fn" id="barFootnote"></div>
       </div>
     </div>
   </div>
 
   <!-- CHART ROW 2 -->
   <div class="grid grid-2">
+    <div class="card" id="thirdCard"></div>
     <div class="card">
       <div class="card-header">
         <div>
-          <span class="card-title">Capacity vs Demand — 2023–2025</span>
-          <span class="card-insight">Capacity ramp driven by phased commissioning — crossed demand baseline line at Q3-2025</span>
+          <span class="card-title" id="healthTitle">Program Health Summary</span>
+          <span class="card-insight" id="healthInsight"></span>
         </div>
       </div>
       <div class="card-body">
-        <div class="chart-wrap"><canvas id="capacityLine"></canvas></div>
-        <div class="legend-row">
-          <span class="l-dot ld-blue">Installed Capacity (K units/yr)</span>
-          <span class="l-dot ld-amber">Baseline Demand (K units/yr)</span>
-        </div>
-        <div class="table-fn">Capacity = process tools only (EQ-003, EQ-004, EQ-014). Support equipment excluded. Demand from S11_Demand_Forecast.</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <span class="card-title">Program Health Summary</span>
-          <span class="card-insight">All three program dimensions on track as of Dec 2025 — supply chain has one active watch item</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="health-grid" style="margin-bottom:14px;">
-          <div class="health-card">
-            <div class="health-lbl">Schedule Status</div>
-            <div class="health-chip chip-green">On Track</div>
-            <div class="health-note">G5 Production Release achieved Q4-2025. No critical path delays. Program closed on schedule.</div>
-          </div>
-          <div class="health-card">
-            <div class="health-lbl">Cost Status</div>
-            <div class="health-chip chip-green">Under Budget</div>
-            <div class="health-note">Actual $13.87M vs $16.06M AR. $2.19M reserve untouched. Zero budget overruns recorded.</div>
-          </div>
-          <div class="health-card">
-            <div class="health-lbl">Supply Chain</div>
-            <div class="health-chip chip-amber">Watch</div>
-            <div class="health-note">Pfeiffer single-source risk (EQ-002) — Shimadzu qualification ongoing. All other OEMs on track.</div>
-          </div>
-        </div>
-        <ul class="dl">
-          <li class="dl-item"><span class="dl-label">Board Approved Budget</span><span class="dl-value">$16,062,000</span></li>
-          <li class="dl-item"><span class="dl-label">Actual CapEx Spend</span><span class="dl-value" style="color:var(--green);">$13,870,000</span></li>
-          <li class="dl-item"><span class="dl-label">10-Year IRR</span><span class="dl-value" style="color:var(--green);">14.2%</span></li>
-          <li class="dl-item"><span class="dl-label">Simple Payback Period</span><span class="dl-value">4.2 years</span></li>
-          <li class="dl-item"><span class="dl-label">10-Year NPV vs Min-CapEx</span><span class="dl-value" style="color:var(--green);">+$9,520,000</span></li>
-        </ul>
+        <div class="health-grid" id="healthGrid" style="margin-bottom:14px;"></div>
+        <ul class="dl" id="decisionList"></ul>
       </div>
     </div>
   </div>
 
-  <!-- MILESTONE SECTION -->
-  <div class="sec-hdr">
-    <h3>Key Milestone Snapshot — Phase II Program Gates</h3>
-    <span>Apr–Dec 2025 · G0 to G5 · Greenfield Expansion Phase II</span>
-  </div>
-
-  <!-- Timeline dots -->
-  <div class="ms-strip" style="margin-bottom:0; border-bottom:none;">
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">G0 / G1</div>
-      <div class="ms-label">AR Approved + All POs Placed</div>
-      <div class="ms-date">Apr 2025</div>
-      <div class="ms-detail">$16.06M AR signed off by Board. All 15 OEM POs awarded within 3 weeks.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">—</div>
-      <div class="ms-label">Hazmat Permit Filed</div>
-      <div class="ms-date">May 2025</div>
-      <div class="ms-detail">12-week regulatory permit for EQ-007 gas system filed on schedule. On critical path.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">—</div>
-      <div class="ms-label">Site Utilities Complete</div>
-      <div class="ms-date">Aug 2025</div>
-      <div class="ms-detail">Electrical, cooling loop, OT network, and floor reinforcement (EQ-004) all signed off.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">G2</div>
-      <div class="ms-label">All FATs Complete</div>
-      <div class="ms-date">Oct 2025</div>
-      <div class="ms-detail">15 of 15 FAT protocols signed. EQ-004 TEL Furnace last to complete. Zero FAT failures.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">G3</div>
-      <div class="ms-label">All Equipment Delivered</div>
-      <div class="ms-date">Oct 2025</div>
-      <div class="ms-detail">All 45 units received on site. EQ-002 Pfeiffer TMP was final delivery — critical path item.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">—</div>
-      <div class="ms-label">All Units Installed</div>
-      <div class="ms-date">Nov 2025</div>
-      <div class="ms-detail">Mechanical install, utility tie-ins, MES integration, and safety interlocks validated for all 15 platforms.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">G4</div>
-      <div class="ms-label">PQ Complete — All Platforms</div>
-      <div class="ms-date">Dec 2025</div>
-      <div class="ms-detail">Process qualification passed on all 15 platforms. 4 re-runs required (EQ-004 furnace zone drift). Zero formal failures.</div>
-    </div>
-    <div class="ms-item">
-      <div class="ms-dot done"></div>
-      <div class="ms-gate">G5</div>
-      <div class="ms-label">Production Release</div>
-      <div class="ms-date">Dec 2025</div>
-      <div class="ms-detail">Formal handover to Operations. SOPs signed, spares stocked, operators trained. 30/90/180-day checkpoints initiated.</div>
-    </div>
-  </div>
-
-  <!-- Milestone detail table -->
-  <div class="card" style="margin-bottom:20px; border-top:none;">
-    <div class="card-body" style="padding:0;">
-      <table class="ms-table">
-        <thead>
-          <tr><th>Gate</th><th>Milestone</th><th>Target Date</th><th>Actual Date</th><th>Owner</th><th>Budget Impact</th><th>Key Dependencies</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-          <tr><td style="font-weight:700;">G0</td><td style="font-weight:600;">Program Kick-Off &amp; Baseline Established</td><td>Apr 2, 2025</td><td>Apr 2, 2025</td><td>Program Manager</td><td class="td-r">—</td><td>Board sign-off on AR</td><td><span class="status st-green">Complete</span></td></tr>
-          <tr><td style="font-weight:700;">G1</td><td style="font-weight:600;">All 15 OEM Purchase Orders Awarded</td><td>Apr 28, 2025</td><td>Apr 25, 2025</td><td>Sourcing Lead</td><td class="td-r">$13.87M</td><td>FX forward contracts placed</td><td><span class="status st-green">Complete · 3 days early</span></td></tr>
-          <tr><td>—</td><td style="font-weight:600;">Hazmat Permit Filed — EQ-007 Gas System</td><td>May 5, 2025</td><td>May 5, 2025</td><td>Regulatory Affairs</td><td class="td-r">$0</td><td>Critical path — 12w permit lead time</td><td><span class="status st-green">Complete · On time</span></td></tr>
-          <tr><td>—</td><td style="font-weight:600;">EQ-002 Pfeiffer TMP — FAT Sign-Off</td><td>Sep 30, 2025</td><td>Sep 30, 2025</td><td>Engineering</td><td class="td-r">$930K PO</td><td>Zero float — CP bottleneck</td><td><span class="status st-green">Complete</span></td></tr>
-          <tr><td>—</td><td style="font-weight:600;">Site Utilities Sign-Off (All Bays)</td><td>Aug 15, 2025</td><td>Aug 18, 2025</td><td>Facilities / Civil</td><td class="td-r">$850K civils</td><td>Floor reinf. EQ-004 — 3 day slip</td><td><span class="status st-amber">Complete · 3d slip (non-CP)</span></td></tr>
-          <tr><td style="font-weight:700;">G2</td><td style="font-weight:600;">All 15 Platform FATs Complete &amp; Signed</td><td>Oct 10, 2025</td><td>Oct 10, 2025</td><td>Engineering / OEMs</td><td class="td-r">—</td><td>All 15 FAT protocols executed</td><td><span class="status st-green">Complete</span></td></tr>
-          <tr><td style="font-weight:700;">G3</td><td style="font-weight:600;">All 45 Units Delivered to Site</td><td>Oct 20, 2025</td><td>Oct 20, 2025</td><td>Logistics</td><td class="td-r">$285K freight</td><td>EQ-002 TMP = final delivery on CP</td><td><span class="status st-green">Complete</span></td></tr>
-          <tr><td>—</td><td style="font-weight:600;">MES / SCADA Integration — All Platforms</td><td>Nov 5, 2025</td><td>Nov 7, 2025</td><td>Controls Engineering</td><td class="td-r">$42K NRE</td><td>Siemens DCS PLC config — 2d slip</td><td><span class="status st-amber">Complete · 2d slip (non-CP)</span></td></tr>
-          <tr><td style="font-weight:700;">G4</td><td style="font-weight:600;">Full Process Qualification (PQ) Passed</td><td>Dec 5, 2025</td><td>Dec 5, 2025</td><td>Process / QA</td><td class="td-r">—</td><td>4 PQ re-runs (EQ-004 zone drift)</td><td><span class="status st-green">Complete</span></td></tr>
-          <tr><td>—</td><td style="font-weight:600;">Spare Parts Stocked · SOPs Signed</td><td>Dec 10, 2025</td><td>Dec 10, 2025</td><td>Operations / Maint.</td><td class="td-r">$124K spares</td><td>12 critical Class-A parts · $124K</td><td><span class="status st-green">Complete</span></td></tr>
-          <tr><td>—</td><td style="font-weight:600;">Operator Training Completed</td><td>Dec 12, 2025</td><td>Dec 11, 2025</td><td>Training / Ops</td><td class="td-r">$18K training</td><td>24 operators certified across 3 shifts</td><td><span class="status st-green">Complete · 1 day early</span></td></tr>
-          <tr><td style="font-weight:700;">G5</td><td style="font-weight:600;">Formal Production Release — Ops Handover</td><td>Dec 15, 2025</td><td>Dec 15, 2025</td><td>Program Manager</td><td class="td-r">—</td><td>30/90/180-day checkpoints initiated</td><td><span class="status st-green">Complete · On schedule</span></td></tr>
-        </tbody>
-      </table>
-      <div class="table-fn">All gates achieved on or before target date. Minor slips (EQ-004 civils +3d, MES integration +2d) were non-critical-path and absorbed within program float. Zero formal gate failures recorded. Next checkpoint: 90-day post-production review Mar 2026.</div>
-    </div>
-  </div>
+  <!-- MILESTONE / READINESS SECTION — populated by executive.js -->
+  <div id="milestoneSection"></div>
 
 </main>
 <div id="site-footer"></div>
+<script src="assets/js/programs-data.js"></script>
 <script src="assets/js/main.js"></script>
 <script src="assets/js/executive.js"></script>
 </body>
