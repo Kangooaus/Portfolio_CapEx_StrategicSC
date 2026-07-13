@@ -43,7 +43,7 @@ The portfolio spans the full lifecycle of a capital equipment programme — from
 
 ## Excel Workbook
 
-The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **33 sheets across 6 zones**, with 989 active formulas and full cross-sheet traceability.
+The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **33 sheets across 6 zones**, with 1,300+ active formulas and full cross-sheet traceability. It is generated from source with the scripts in `build/` (`python3 build/build_workbook.py`), so the whole model is reproducible and auditable.
 
 | Zone | Sheets | Content |
 |---|---|---|
@@ -77,8 +77,11 @@ Portfolio_CapEx_StrategicSC/
 │       ├── execution.js        → Execution & risk charts
 │       ├── deep-dive.js        → Deep dive charts
 │       └── sourcing.js         → Sourcing framework charts
-└── downloads/
-    └── CapEx_StrategicSC_Portfolio.xlsx
+├── downloads/
+│   ├── CapEx_StrategicSC_Portfolio.xlsx   → Full 33-sheet workbook (generated)
+│   └── CapEx_StrategicSC_Portfolio.pdf    → Print export of the workbook
+└── build/                      → Python/openpyxl scripts that generate the .xlsx from source
+    └── build_workbook.py       → Entry point: `python3 build/build_workbook.py`
 ```
 
 ---
