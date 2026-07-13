@@ -115,6 +115,15 @@ def upsert_equipment(row, conn=None):
         conn.close()
 
 
+def delete_equipment(program_ref, equip_id, conn=None):
+    own = conn is None
+    conn = conn or get_connection()
+    conn.execute("DELETE FROM equipment WHERE program_ref = ? AND equip_id = ?", (program_ref, equip_id))
+    conn.commit()
+    if own:
+        conn.close()
+
+
 # --------------------------------------------------------------- suppliers
 
 def list_suppliers(program_ref=None, conn=None):
@@ -150,6 +159,33 @@ def upsert_supplier(row, conn=None):
         conn.close()
 
 
+def upsert_supplier_by_key(row, conn=None):
+    """Suppliers have no DB-level unique key (see schema.sql), so imports match
+    on (program_ref, equip_ref) by convention -- one supplier per component per
+    program in today's data -- and update that row in place instead of
+    inserting a duplicate."""
+    own = conn is None
+    conn = conn or get_connection()
+    existing = conn.execute(
+        "SELECT id FROM suppliers WHERE program_ref = ? AND equip_ref = ?",
+        (row["program_ref"], row["equip_ref"]),
+    ).fetchone()
+    if existing:
+        row = dict(row, id=existing["id"])
+    upsert_supplier(row, conn=conn)
+    if own:
+        conn.close()
+
+
+def delete_supplier(supplier_id, conn=None):
+    own = conn is None
+    conn = conn or get_connection()
+    conn.execute("DELETE FROM suppliers WHERE id = ?", (supplier_id,))
+    conn.commit()
+    if own:
+        conn.close()
+
+
 # -------------------------------------------------------------- risk_items
 
 def list_risk_items(program_ref=None, conn=None):
@@ -180,6 +216,32 @@ def upsert_risk_item(row, conn=None):
     else:
         placeholders = ",".join("?" for _ in cols)
         conn.execute(f"INSERT INTO risk_items ({','.join(cols)}) VALUES ({placeholders})", values)
+    conn.commit()
+    if own:
+        conn.close()
+
+
+def upsert_risk_item_by_key(row, conn=None):
+    """Risk items have no DB-level unique key; imports match on
+    (program_ref, equip_ref, component) -- distinct risk rows for the same
+    equip_ref are differentiated by component text in today's data."""
+    own = conn is None
+    conn = conn or get_connection()
+    existing = conn.execute(
+        "SELECT id FROM risk_items WHERE program_ref = ? AND equip_ref = ? AND component = ?",
+        (row["program_ref"], row["equip_ref"], row["component"]),
+    ).fetchone()
+    if existing:
+        row = dict(row, id=existing["id"])
+    upsert_risk_item(row, conn=conn)
+    if own:
+        conn.close()
+
+
+def delete_risk_item(risk_item_id, conn=None):
+    own = conn is None
+    conn = conn or get_connection()
+    conn.execute("DELETE FROM risk_items WHERE id = ?", (risk_item_id,))
     conn.commit()
     if own:
         conn.close()
