@@ -51,8 +51,11 @@ def _program_id_rows(ws, program_id_col):
             yield row
 
 
-def _yn(value, true_val="Yes"):
-    return 1 if value == true_val else 0
+def _yn(value):
+    """Normalize any Yes/No spelling (Excel uses 'Yes' on S03, 'YES' on S16)
+    to the DB's canonical 'Yes'/'No' text, case-insensitively -- so a stray
+    lowercase 'yes' typed into a cell doesn't silently import as 'No'."""
+    return "Yes" if str(value).strip().lower() == "yes" else "No"
 
 
 # ------------------------------------------------------------- equipment
@@ -133,7 +136,7 @@ def read_risk_items(wb):
             "delay_prob": row[5].value,
             "sched_impact": row[6].value,
             "replace_difficulty": row[7].value,
-            "single_source": _yn(row[10].value, true_val="YES"),
+            "single_source": _yn(row[10].value),
             "buffer_stock": _yn(row[11].value),
             "mitigation": row[12].value,
             "status": row[13].value,

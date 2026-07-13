@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import openpyxl
 import s00_index, s01_assumptions, s02_equipment, s03_supplier, s04_shouldcost, s05_tco
 import s06_wbs, s07_cpm, s08_roadmap, s09_deployment, s10_capacity, s11_demand
@@ -7,7 +9,7 @@ import s25_gates, s26_eco, s27_vdc, s28_yield, s29_roi, s31_scorecard, s32_chang
 import s30_dashboard
 import s33_portfolio_register, s34_portfolio_dashboard, s35_portfolio_prioritization
 
-OUT_PATH = "/home/user/Portfolio_CapEx_StrategicSC/downloads/CapEx_StrategicSC_Portfolio.xlsx"
+OUT_PATH = Path(__file__).resolve().parent.parent / "downloads" / "CapEx_StrategicSC_Portfolio.xlsx"
 
 
 def main():

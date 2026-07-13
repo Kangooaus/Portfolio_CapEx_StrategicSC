@@ -13,8 +13,8 @@ def _write_risk_rows(ws, r, rows, program_id):
         eq, sup, comp = ri["equip_ref"], ri["supplier"], ri["component"]
         stdlt, curlt = ri["std_lead"], ri["current_lead"]
         prob, sched, repl = ri["delay_prob"], ri["sched_impact"], ri["replace_difficulty"]
-        single = "YES" if ri["single_source"] else "No"
-        buf = "Yes" if ri["buffer_stock"] else "No"
+        single = "YES" if ri["single_source"] == "Yes" else "No"
+        buf = ri["buffer_stock"]
         mit, status = ri["mitigation"], ri["status"]
         ws.cell(row=r, column=1, value=eq)
         ws.cell(row=r, column=2, value=sup)

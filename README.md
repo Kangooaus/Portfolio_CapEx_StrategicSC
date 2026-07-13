@@ -53,7 +53,7 @@ The Executive Dashboard is the flagship of the multi-project pattern: switch to 
 
 ## Excel Workbook
 
-The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **36 sheets across 7 zones**, with 1,300+ active formulas and full cross-sheet traceability. It is generated from source with the scripts in `build/` (`python3 build/build_workbook.py`), so the whole model is reproducible and auditable.
+The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **36 sheets across 7 zones**, with 1,300+ active formulas and full cross-sheet traceability. Its core data (equipment, suppliers, risk register, assumptions, program register) lives in `db/capex_portfolio.db` and is generated into the workbook with the scripts in `build/` (`python3 build/build_workbook.py`), so the whole model is reproducible and auditable — see [Data Workflow](#data-workflow) below for how to edit it.
 
 | Zone | Sheets | Content |
 |---|---|---|
@@ -103,9 +103,47 @@ Portfolio_CapEx_StrategicSC/
 ├── downloads/
 │   ├── CapEx_StrategicSC_Portfolio.xlsx   → Full 36-sheet, 2-program workbook (generated)
 │   └── CapEx_StrategicSC_Portfolio.pdf    → Print export of the workbook
-└── build/                      → Python/openpyxl scripts that generate the .xlsx from source
-    └── build_workbook.py       → Entry point: `python3 build/build_workbook.py`
+├── db/
+│   ├── schema.sql               → Table/view definitions — the source of truth's structure
+│   └── capex_portfolio.db       → SQLite database — the source of truth's data (committed, editable)
+└── build/                       → Python/openpyxl scripts; everything here regenerates from db/capex_portfolio.db
+    ├── db.py                    → Backend/data-access layer — the ONLY module that touches sqlite3
+    ├── seed_from_current.py     → One-time: loads the original hardcoded data into a fresh DB
+    ├── build_workbook.py        → DB → downloads/CapEx_StrategicSC_Portfolio.xlsx
+    ├── export_site_data.py      → DB → assets/js/programs-data.js
+    ├── refresh_all.py           → Runs both of the above, in order (run this after any DB edit)
+    ├── import_excel.py          → Excel → DB sync, with a dry-run diff (see Data Workflow below)
+    └── s*.py                    → One generator module per workbook sheet
 ```
+
+---
+
+## Data Workflow
+
+`db/capex_portfolio.db` (SQLite) is the source of truth. The Excel workbook and the website's `programs-data.js` are both *generated* from it — never edited by hand — so the three can never quietly drift apart. There are two ways to make an edit:
+
+**Option A — DB Browser for SQLite (recommended for structured edits: rows, flags, new suppliers)**
+
+1. Install [DB Browser for SQLite](https://sqlitebrowser.org/) (free, Windows/Mac/Linux).
+2. Open `db/capex_portfolio.db`.
+3. Go to the **Browse Data** tab, pick a table (`equipment`, `suppliers`, `risk_items`, `assumptions`, `programs`), and edit cells directly. Yes/No flags (`single_source`, `alt_supplier_available`, `buffer_stock`) are stored as the literal text `Yes`/`No` — the same words the Excel sheet shows — not `0`/`1`, so there's nothing to decode.
+4. Click **Write Changes** (or Ctrl+S) to save.
+5. From `build/`, run `python3 refresh_all.py` to regenerate both the workbook and the site data from the updated DB.
+
+**Option B — edit the Excel workbook directly, then import**
+
+1. Open `downloads/CapEx_StrategicSC_Portfolio.xlsx` (the same file the site's "↓ Workbook" button downloads).
+2. Edit any **blue-font input cell** — unit costs, lead times, reliability scores, assumption values, a program's IRR/NPV/payback estimate. Leave black-font formula cells and green cross-sheet links alone; those are recalculated, not stored.
+3. Save the file to the same path.
+4. From `build/`, run `python3 import_excel.py` — this is a **dry run** by default: it reports exactly which rows and fields changed, without writing anything.
+5. Review the diff, then run `python3 import_excel.py --apply` to write it to the database.
+6. Run `python3 refresh_all.py` so the workbook (now re-derived from the DB) and the site data stay in lockstep with what you just imported.
+
+Only input cells are read back — formula cells (totals, calculated risk scores, cross-sheet links) are recomputed by the DB-driven generators, never imported. Two S33 fields (Strategic Capacity Impact, Notes) are Excel-only presentation text with no DB column, and PRG-002's FX Reserve/NRE reserve are baked into a formula literal rather than their own cell — edit those, if ever, directly in the `programs` table.
+
+This is a one-way sync triggered explicitly by running a script, not a live link — if the same row is edited in Excel and in DB Browser before either is imported, whichever is imported second wins. For a single-editor portfolio like this one that's a non-issue; it's worth knowing if you extend this to a team workflow.
+
+**Setup:** `pip install -r build/requirements.txt` (just `openpyxl`; everything else is standard library).
 
 ---
 

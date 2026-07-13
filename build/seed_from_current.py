@@ -273,6 +273,12 @@ ASSUMPTIONS = [
 ]
 
 
+def _yn(v):
+    """Source literals above still use 0/1; the DB stores 'Yes'/'No' text so
+    it reads the same way in DB Browser as it does in the Excel column."""
+    return "Yes" if v else "No"
+
+
 def seed():
     db.init_schema()
     conn = db.get_connection()
@@ -292,28 +298,24 @@ def seed():
              "op_hrs_yr", "notes"], e), program_ref="PRG-002", sort_order=i), conn=conn)
 
     conn.execute("DELETE FROM suppliers")  # suppliers has no natural unique key; reseed clean
-    for i, s in enumerate(SUPPLIERS_PRG1):
-        db.upsert_supplier(dict(zip(
-            ["supplier_name", "component_type", "equip_ref", "region", "currency", "std_lt_wks",
-             "current_lt_wks", "reliability", "single_source", "alt_supplier_available", "notes"], s),
-            program_ref="PRG-001", sort_order=i), conn=conn)
-    for i, s in enumerate(SUPPLIERS_PRG2):
-        db.upsert_supplier(dict(zip(
-            ["supplier_name", "component_type", "equip_ref", "region", "currency", "std_lt_wks",
-             "current_lt_wks", "reliability", "single_source", "alt_supplier_available", "notes"], s),
-            program_ref="PRG-002", sort_order=i), conn=conn)
+    supplier_keys = ["supplier_name", "component_type", "equip_ref", "region", "currency", "std_lt_wks",
+                      "current_lt_wks", "reliability", "single_source", "alt_supplier_available", "notes"]
+    for program_ref, rows in (("PRG-001", SUPPLIERS_PRG1), ("PRG-002", SUPPLIERS_PRG2)):
+        for i, s in enumerate(rows):
+            row = dict(zip(supplier_keys, s))
+            row["single_source"] = _yn(row["single_source"])
+            row["alt_supplier_available"] = _yn(row["alt_supplier_available"])
+            db.upsert_supplier(dict(row, program_ref=program_ref, sort_order=i), conn=conn)
 
     conn.execute("DELETE FROM risk_items")
-    for i, r in enumerate(RISK_ITEMS_PRG1):
-        db.upsert_risk_item(dict(zip(
-            ["equip_ref", "supplier", "component", "std_lead", "current_lead", "delay_prob",
-             "sched_impact", "replace_difficulty", "single_source", "buffer_stock", "mitigation", "status"], r),
-            program_ref="PRG-001", sort_order=i), conn=conn)
-    for i, r in enumerate(RISK_ITEMS_PRG2):
-        db.upsert_risk_item(dict(zip(
-            ["equip_ref", "supplier", "component", "std_lead", "current_lead", "delay_prob",
-             "sched_impact", "replace_difficulty", "single_source", "buffer_stock", "mitigation", "status"], r),
-            program_ref="PRG-002", sort_order=i), conn=conn)
+    risk_keys = ["equip_ref", "supplier", "component", "std_lead", "current_lead", "delay_prob",
+                 "sched_impact", "replace_difficulty", "single_source", "buffer_stock", "mitigation", "status"]
+    for program_ref, rows in (("PRG-001", RISK_ITEMS_PRG1), ("PRG-002", RISK_ITEMS_PRG2)):
+        for i, r in enumerate(rows):
+            row = dict(zip(risk_keys, r))
+            row["single_source"] = _yn(row["single_source"])
+            row["buffer_stock"] = _yn(row["buffer_stock"])
+            db.upsert_risk_item(dict(row, program_ref=program_ref, sort_order=i), conn=conn)
 
     conn.execute("DELETE FROM assumptions")
     for i, a in enumerate(ASSUMPTIONS):

@@ -12,8 +12,8 @@ def _write_supplier_rows(ws, r, rows, program_id):
         sup, comp, eqref = s["supplier_name"], s["component_type"], s["equip_ref"]
         region, ccy = s["region"], s["currency"]
         stdlt, curlt, rel = s["std_lt_wks"], s["current_lt_wks"], s["reliability"]
-        single = "Yes" if s["single_source"] else "No"
-        alt = "Yes" if s["alt_supplier_available"] else "No"
+        single = s["single_source"]
+        alt = s["alt_supplier_available"]
         notes = s["notes"]
         ws.cell(row=r, column=1, value=sup).font = BLUE_INPUT
         ws.cell(row=r, column=2, value=comp).font = BLUE_INPUT

@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS suppliers (
     std_lt_wks                 REAL NOT NULL,
     current_lt_wks              REAL NOT NULL,
     reliability                 REAL NOT NULL,      -- 0-100
-    single_source                INTEGER NOT NULL DEFAULT 0,
-    alt_supplier_available       INTEGER NOT NULL DEFAULT 0,
+    single_source                TEXT NOT NULL DEFAULT 'No',  -- 'Yes' | 'No' -- matches Excel's own column text, so DB Browser's Browse Data tab is self-explanatory
+    alt_supplier_available       TEXT NOT NULL DEFAULT 'No',  -- 'Yes' | 'No'
     notes                         TEXT,
     sort_order                    INTEGER NOT NULL DEFAULT 0
 );
@@ -116,8 +116,8 @@ CREATE TABLE IF NOT EXISTS risk_items (
     delay_prob                REAL NOT NULL,        -- 0-1
     sched_impact               REAL NOT NULL,        -- 1-5
     replace_difficulty          REAL NOT NULL,        -- 1-5
-    single_source                INTEGER NOT NULL DEFAULT 0,
-    buffer_stock                  INTEGER NOT NULL DEFAULT 0,
+    single_source                TEXT NOT NULL DEFAULT 'No',  -- 'Yes' | 'No' -- matches Excel's own column text, so DB Browser's Browse Data tab is self-explanatory
+    buffer_stock                  TEXT NOT NULL DEFAULT 'No',  -- 'Yes' | 'No'
     mitigation                    TEXT,
     status                        TEXT,
     sort_order                    INTEGER NOT NULL DEFAULT 0
@@ -163,7 +163,7 @@ CREATE VIEW IF NOT EXISTS v_program_supplier_totals AS
 SELECT
     program_ref,
     COUNT(*)                                    AS supplier_count,
-    SUM(single_source)                          AS single_source_count,
+    SUM(CASE WHEN single_source = 'Yes' THEN 1 ELSE 0 END) AS single_source_count,
     AVG(current_lt_wks)                          AS avg_current_lt_wks,
     AVG(reliability)                             AS avg_reliability
 FROM suppliers
@@ -175,7 +175,7 @@ SELECT
     COUNT(*)                                     AS risk_item_count,
     AVG(delay_prob * sched_impact * replace_difficulty) AS avg_risk_score,
     MAX(delay_prob * sched_impact * replace_difficulty) AS max_risk_score,
-    SUM(single_source)                           AS single_source_risk_count
+    SUM(CASE WHEN single_source = 'Yes' THEN 1 ELSE 0 END) AS single_source_risk_count
 FROM risk_items
 GROUP BY program_ref;
 
