@@ -17,12 +17,12 @@
       <div class="nav-system">CapEx Program Control Tower</div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab" data-page="index.html" onclick="location.href='index.html'">Home</button>
-      <button class="nav-tab" data-page="executive.html" onclick="location.href='executive.html'">Executive Dashboard</button>
-      <button class="nav-tab active" data-page="supply-chain.html" onclick="location.href='supply-chain.html'">Strategic Supply Chain</button>
-      <button class="nav-tab" data-page="execution-risk.html" onclick="location.href='execution-risk.html'">Execution &amp; Risk</button>
-      <button class="nav-tab" data-page="deep-dive.html" onclick="location.href='deep-dive.html'">Deep Dive</button>
-      <button class="nav-tab" onclick="location.href='sourcing-framework.html'">Sourcing Framework</button>
+      <button class="nav-tab" data-page="index.html" onclick="go('index.html')">Home</button>
+      <button class="nav-tab" data-page="executive.html" onclick="go('executive.html')">Executive Dashboard</button>
+      <button class="nav-tab active" data-page="supply-chain.html" onclick="go('supply-chain.html')">Strategic Supply Chain</button>
+      <button class="nav-tab" data-page="execution-risk.html" onclick="go('execution-risk.html')">Execution &amp; Risk</button>
+      <button class="nav-tab" data-page="deep-dive.html" onclick="go('deep-dive.html')">Deep Dive</button>
+      <button class="nav-tab" onclick="go('sourcing-framework.html')">Sourcing Framework</button>
     </div>
     <div class="nav-actions">
       <button class="nav-btn">Export</button>
@@ -244,6 +244,7 @@
 
 </main>
 <div id="site-footer"></div>
+<script src="assets/js/programs-data.js"></script>
 <script src="assets/js/main.js"></script>
 <script src="assets/js/supply-chain.js"></script>
 </body>

@@ -15,12 +15,12 @@
       <div class="nav-system">CapEx Program Control Tower</div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="location.href='index.html'">Home</button>
-      <button class="nav-tab" onclick="location.href='executive.html'">Executive Dashboard</button>
-      <button class="nav-tab" onclick="location.href='supply-chain.html'">Strategic Supply Chain</button>
-      <button class="nav-tab" onclick="location.href='execution-risk.html'">Execution &amp; Risk</button>
-      <button class="nav-tab" onclick="location.href='deep-dive.html'">Deep Dive</button>
-      <button class="nav-tab" onclick="location.href='sourcing-framework.html'">Sourcing Framework</button>
+      <button class="nav-tab active" onclick="go('index.html')">Home</button>
+      <button class="nav-tab" onclick="go('executive.html')">Executive Dashboard</button>
+      <button class="nav-tab" onclick="go('supply-chain.html')">Strategic Supply Chain</button>
+      <button class="nav-tab" onclick="go('execution-risk.html')">Execution &amp; Risk</button>
+      <button class="nav-tab" onclick="go('deep-dive.html')">Deep Dive</button>
+      <button class="nav-tab" onclick="go('sourcing-framework.html')">Sourcing Framework</button>
     </div>
     <div class="nav-actions">
       <button class="nav-btn primary" onclick="location.href='downloads/CapEx_StrategicSC_Portfolio.xlsx'">↓ Workbook</button>
@@ -35,7 +35,7 @@
     <p style="font-family:var(--fs);font-size:clamp(12px,1vw,15px);color:rgba(255,255,255,0.55);margin-bottom:8px;font-style:italic;">Engineering Program Management – CapEx &amp; Supply Chain Operations</p>
     <p style="font-size:clamp(11px,0.85vw,14px);color:rgba(255,255,255,0.45);max-width:600px;line-height:1.65;margin-bottom:24px;">A portfolio demonstration of capital equipment program management, strategic supply chain operations, sourcing strategy, dual-source planning, logistics control, and program execution governance across a $13.87M advanced manufacturing deployment.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button onclick="location.href='executive.html'" style="padding:9px 20px;font-size:12px;font-weight:600;font-family:var(--fu);background:#fff;color:var(--navy);border:none;cursor:pointer;">View Executive Dashboard</button>
+      <button onclick="go('executive.html')" style="padding:9px 20px;font-size:12px;font-weight:600;font-family:var(--fu);background:#fff;color:var(--navy);border:none;cursor:pointer;">View Executive Dashboard</button>
       <button onclick="location.href='downloads/CapEx_StrategicSC_Portfolio.xlsx'" style="padding:9px 20px;font-size:12px;font-weight:600;font-family:var(--fu);background:transparent;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.3);cursor:pointer;">↓ Download Workbook</button>
     </div>
   </div>
@@ -43,18 +43,15 @@
 
 <main class="dashboard">
 
-  <!-- KPI STRIP -->
-  <div class="kpi-grid" style="margin-top:24px;">
-    <div class="kpi-card navy"><div class="kpi-label">Total CapEx Investment</div><div class="kpi-value neutral">$13.87M</div><div class="kpi-context">Equipment + installation</div></div>
-    <div class="kpi-card"><div class="kpi-label">Equipment Platforms</div><div class="kpi-value neutral">15</div><div class="kpi-context">45 units · 6 categories</div></div>
-    <div class="kpi-card success"><div class="kpi-label">Annual Production Capacity</div><div class="kpi-value positive">1,040K</div><div class="kpi-context">units/yr · process tools</div></div>
-    <div class="kpi-card success"><div class="kpi-label">Portfolio Utilization</div><div class="kpi-value positive">72.1%</div><div class="kpi-context">vs 750K baseline demand</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Active Suppliers</div><div class="kpi-value neutral">15</div><div class="kpi-context">5 countries · 15 OEMs</div></div>
-    <div class="kpi-card danger"><div class="kpi-label">Single-Source Risks</div><div class="kpi-value danger">2</div><div class="kpi-context">Hardware suppliers</div></div>
-  </div>
+  <!-- PORTFOLIO KPI STRIP — populated by home.js from getPortfolioTotals() -->
+  <div class="kpi-grid" id="portfolioKpiGrid" style="margin-top:24px;"></div>
+
+  <!-- PROGRAMS IN PORTFOLIO -->
+  <div class="sec-hdr"><h3>Programs in Portfolio</h3><span id="programCountLabel"></span></div>
+  <div id="programCards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;"></div>
 
   <!-- CAPABILITIES -->
-  <div class="sec-hdr"><h3>Portfolio Capabilities Demonstrated</h3><span>Greenfield Expansion Phase II · FY2025</span></div>
+  <div class="sec-hdr"><h3>Portfolio Capabilities Demonstrated</h3><span>Illustrated on Greenfield Expansion Phase II · FY2025</span></div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;">
     <div style="background:var(--bg2);border:1px solid var(--border);border-top:3px solid var(--navy);padding:16px;box-shadow:var(--shadow);">
       <div style="font-size:1.2rem;margin-bottom:8px;">⬛</div>
@@ -81,31 +78,31 @@
   <!-- DASHBOARD PREVIEWS -->
   <div class="sec-hdr"><h3>Dashboard Pages</h3><span>Four analytical views</span></div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
-    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="location.href='executive.html'">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="go('executive.html')">
       <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--t3);">Page 02</div>
       <div style="font-family:var(--fs);font-size:clamp(12px,1vw,15px);font-weight:600;">Executive Dashboard</div>
       <p style="font-size:clamp(10px,0.7vw,11.5px);color:var(--t2);line-height:1.5;">KPIs, CapEx allocation, deployment status, capacity vs demand, program health, milestones.</p>
       <span style="font-size:11px;font-weight:600;color:var(--slate);margin-top:auto;">View Dashboard →</span>
     </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="location.href='supply-chain.html'">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="go('supply-chain.html')">
       <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--t3);">Page 03</div>
       <div style="font-family:var(--fs);font-size:clamp(12px,1vw,15px);font-weight:600;">Strategic Supply Chain</div>
       <p style="font-size:clamp(10px,0.7vw,11.5px);color:var(--t2);line-height:1.5;">Market concentration, supplier geography, negotiation savings, lead times, dual-source strategy.</p>
       <span style="font-size:11px;font-weight:600;color:var(--slate);margin-top:auto;">View Supply Chain →</span>
     </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="location.href='execution-risk.html'">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="go('execution-risk.html')">
       <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--t3);">Page 04</div>
       <div style="font-family:var(--fs);font-size:clamp(12px,1vw,15px);font-weight:600;">Execution &amp; Risk</div>
       <p style="font-size:clamp(10px,0.7vw,11.5px);color:var(--t2);line-height:1.5;">WBS tree, critical path, milestone roadmap, risk distribution, inventory coverage, asset lifecycle.</p>
       <span style="font-size:11px;font-weight:600;color:var(--slate);margin-top:auto;">View Execution →</span>
     </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="location.href='deep-dive.html'">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;" onclick="go('deep-dive.html')">
       <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--t3);">Page 05</div>
       <div style="font-family:var(--fs);font-size:clamp(12px,1vw,15px);font-weight:600;">Deep Dive</div>
       <p style="font-size:clamp(10px,0.7vw,11.5px);color:var(--t2);line-height:1.5;">Yield/OEE metrics, supplier capacity analysis, ECO register, asset snapshot, documentation.</p>
       <span style="font-size:11px;font-weight:600;color:var(--slate);margin-top:auto;">View Deep Dive →</span>
     </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;border-top:3px solid #534AB7;" onclick="location.href='sourcing-framework.html'">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;border-top:3px solid #534AB7;" onclick="go('sourcing-framework.html')">
       <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--t3);">Page 06</div>
       <div style="font-family:var(--fs);font-size:clamp(12px,1vw,15px);font-weight:600;">Sourcing Framework</div>
       <p style="font-size:clamp(10px,0.7vw,11.5px);color:var(--t2);line-height:1.5;">FEL 1–3 phase map, AACE cost estimating, RFI/RFP pipeline, should-cost methodology, FID checklist, and post-FID execution tracking.</p>
@@ -115,6 +112,8 @@
 
 </main>
 <div id="site-footer"></div>
+<script src="assets/js/programs-data.js"></script>
 <script src="assets/js/main.js"></script>
+<script src="assets/js/home.js"></script>
 </body>
 </html>

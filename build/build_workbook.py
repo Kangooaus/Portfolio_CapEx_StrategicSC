@@ -5,6 +5,7 @@ import s12_ar_summary, s13_scenario, s14_cashflow, s15_fx, s16_risk
 import s17_market, s18_network, s19_sourcing, s20_dualsource, s21_negotiation, s22_capacity_supplier, s23_inventory, s24_assets
 import s25_gates, s26_eco, s27_vdc, s28_yield, s29_roi, s31_scorecard, s32_changetracker
 import s30_dashboard
+import s33_portfolio_register, s34_portfolio_dashboard, s35_portfolio_prioritization
 
 OUT_PATH = "/home/user/Portfolio_CapEx_StrategicSC/downloads/CapEx_StrategicSC_Portfolio.xlsx"
 
@@ -63,8 +64,14 @@ def main():
     })
     s00_index.build(wb)
 
-    # Reorder sheets: S00, S01, S02...S29, S30 dashboard near top per index (keep S30 as 3rd for recruiter visibility), S31, S32
-    order = ["S00_Index", "S01_Disclaimer_Assumptions",
+    # Zone 6: Portfolio & Capital Allocation (multi-program rollup layer)
+    s33r = s33_portfolio_register.build(wb, s02r, s03r, s16r, s12r)
+    s34_portfolio_dashboard.build(wb, s33r)
+    s35_portfolio_prioritization.build(wb, s33r)
+
+    # Reorder sheets: S00 Index -> Portfolio layer (S34/S33/S35) -> Program 1 detail (S01-S32)
+    order = ["S00_Index", "S34_Portfolio_Dashboard", "S33_Portfolio_Register", "S35_Portfolio_Prioritization",
+             "S01_Disclaimer_Assumptions",
              "S02_Equipment_Portfolio", "S03_Supplier_Dataset", "S04_Should_Cost_Model", "S05_TCO_Downtime_Model",
              "S06_WBS", "S07_CPM_Master_Schedule", "S08_Program_Milestone_Roadmap", "S09_Deployment_Timeline",
              "S10_Capacity_Planning", "S11_Demand_Forecast",

@@ -34,22 +34,29 @@ SUPPLIERS = [
      "Fleet SW license bundled; Wi-Fi site survey required 6 wks pre-installation"),
 ]
 
+# Program 2 — Riverside Automation Upgrade Phase I (PRG-002)
+SUPPLIERS_PRG2 = [
+    ("Fanuc America", "Palletizing Robots", "RV-001", "USA", "USD", 10, 12, 91, "No", "Yes",
+     "Deep bench of qualified integrators; low supply risk; standard robot platform"),
+    ("Krones AG", "Case Packer / Cartoning Systems", "RV-002", "DE", "EUR", 20, 24, 86, "Yes", "No",
+     "Single-source specialized cartoning technology; no qualified alternative identified"),
+    ("Fetch Robotics", "AGV Fleet Units", "RV-003", "USA", "USD", 8, 9, 93, "No", "Yes",
+     "Mature AGV platform; Locus Robotics evaluated as viable alternate"),
+    ("Cognex Corporation", "Vision Inspection Systems", "RV-004", "USA", "USD", 6, 7, 95, "No", "Yes",
+     "Commodity machine-vision hardware; Keyence pre-qualified as alternate"),
+    ("Rockwell Automation", "Warehouse Control System", "RV-005", "USA", "USD", 8, 9, 94, "No", "Yes",
+     "Strong integrator relationship; low supply risk; standard PlantPAx platform"),
+    ("Dematic Corp", "Conveyor & Sortation Systems", "RV-006", "USA", "USD", 16, 20, 88, "No", "Yes",
+     "Complex site-specific integration; Honeywell Intelligrated evaluated as alternate"),
+]
+
 HEADERS = ["Supplier", "Component Type", "Equip. Ref", "Region", "Ccy", "Std LT (wks)",
            "Current LT (wks)", "LT Delta (wks)", "Reliability (0-100)", "Single Source Risk",
-           "Alt Supplier Available", "Calc. Risk Score", "Risk Tier", "Engineering Notes"]
+           "Alt Supplier Available", "Calc. Risk Score", "Risk Tier", "Engineering Notes", "Program ID"]
 
 
-def build(wb):
-    ws = wb.create_sheet("S03_Supplier_Dataset")
-    set_tab_color(ws, 1)
-    row = title_block(ws, 1, "S03", "Supplier & Supply Chain Dataset — Advanced Manufacturing CapEx Program",
-                       "Program: Greenfield Expansion Phase II | Last Updated: 2025-Q1 | Owner: Supply Chain / Sourcing Team | "
-                       "Risk Score = (Current LT ÷ Standard LT) × (100 − Reliability Score)  |  Risk Tier: LOW < 5 | MODERATE 5–15 | HIGH > 15",
-                       n_cols=14)
-    header_row = write_headers(ws, row, 1, HEADERS, 1)
-    first_data_row = header_row
-    r = header_row
-    for s in SUPPLIERS:
+def _write_supplier_rows(ws, r, rows, program_id):
+    for s in rows:
         (sup, comp, eqref, region, ccy, stdlt, curlt, rel, single, alt, notes) = s
         ws.cell(row=r, column=1, value=sup).font = BLUE_INPUT
         ws.cell(row=r, column=2, value=comp).font = BLUE_INPUT
@@ -64,16 +71,34 @@ def build(wb):
         ws.cell(row=r, column=11, value=alt).font = BLUE_INPUT
         risk = ws.cell(row=r, column=12, value=f"=ROUND((G{r}/F{r})*(100-I{r}),2)")
         risk.number_format = CUR2
-        tier = ws.cell(row=r, column=13, value=f'=IF(L{r}>15,"HIGH",IF(L{r}>=5,"MODERATE","LOW"))')
+        ws.cell(row=r, column=13, value=f'=IF(L{r}>15,"HIGH",IF(L{r}>=5,"MODERATE","LOW"))')
         notes_c = ws.cell(row=r, column=14, value=notes)
         notes_c.alignment = LEFT_WRAP
-        for c in range(1, 15):
+        pid = ws.cell(row=r, column=15, value=program_id)
+        pid.font = BLUE_INPUT
+        pid.alignment = CENTER
+        for c in range(1, 16):
             ws.cell(row=r, column=c).border = BORDER_ALL
         r += 1
+    return r
+
+
+def build(wb):
+    ws = wb.create_sheet("S03_Supplier_Dataset")
+    set_tab_color(ws, 1)
+    row = title_block(ws, 1, "S03", "Supplier & Supply Chain Dataset — Advanced Manufacturing CapEx Program",
+                       "Last Updated: 2025-Q3 | Owner: Supply Chain / Sourcing Team | "
+                       "Risk Score = (Current LT ÷ Standard LT) × (100 − Reliability Score)  |  Risk Tier: LOW < 5 | MODERATE 5–15 | HIGH > 15 | "
+                       "Program ID column enables portfolio-wide rollups",
+                       n_cols=15)
+    header_row = write_headers(ws, row, 1, HEADERS, 1)
+    first_data_row = header_row
+    r = header_row
+    r = _write_supplier_rows(ws, r, SUPPLIERS, "PRG-001")
     last_data_row = r - 1
 
     row = r + 1
-    row = section_header(ws, row, 1, "SUPPLY CHAIN RISK SUMMARY", 2, 1)
+    row = section_header(ws, row, 1, "PRG-001 SUPPLY CHAIN RISK SUMMARY — Greenfield Expansion Phase II", 2, 1)
     stats = [
         ("Avg Standard Lead Time (wks)", f"=AVERAGE(F{first_data_row}:F{last_data_row})", CUR2),
         ("Avg Current Lead Time (wks)", f"=AVERAGE(G{first_data_row}:G{last_data_row})", CUR2),
@@ -93,12 +118,39 @@ def build(wb):
         c.font = BOLD
         c.border = BORDER_ALL
         row += 1
+    row += 1
 
-    autosize(ws, {1: 26, 2: 24, 3: 10, 4: 8, 5: 6, 6: 10, 7: 11, 8: 10, 9: 12, 10: 12, 11: 12, 12: 12, 13: 11, 14: 50})
+    # --- Program 2 block ---
+    row = section_header(ws, row, 1, "PRG-002 SUPPLIERS — Riverside Automation Upgrade Phase I", 15, 1)
+    prg2_header_row = write_headers(ws, row, 1, HEADERS, 1)
+    prg2_first_row = prg2_header_row
+    r = prg2_header_row
+    r = _write_supplier_rows(ws, r, SUPPLIERS_PRG2, "PRG-002")
+    prg2_last_row = r - 1
+    row = r + 1
+
+    row = section_header(ws, row, 1, "PRG-002 SUPPLY CHAIN RISK SUMMARY — Riverside Automation Upgrade Phase I", 2, 1)
+    prg2_stats = [
+        ("Avg Calculated Risk Score", f"=AVERAGE(L{prg2_first_row}:L{prg2_last_row})", CUR2),
+        ("Max Risk Score (Worst Supplier)", f"=MAX(L{prg2_first_row}:L{prg2_last_row})", CUR2),
+        ("# Single-Source Components", f'=COUNTIF(J{prg2_first_row}:J{prg2_last_row},"Yes")', CUR0),
+        ("# HIGH Risk Tier Suppliers", f'=COUNTIF(M{prg2_first_row}:M{prg2_last_row},"HIGH")', CUR0),
+    ]
+    prg2_stat_start = row
+    for label, formula, fmt in prg2_stats:
+        ws.cell(row=row, column=1, value=label).border = BORDER_ALL
+        c = ws.cell(row=row, column=2, value=formula)
+        c.number_format = fmt
+        c.font = BOLD
+        c.border = BORDER_ALL
+        row += 1
+
+    autosize(ws, {1: 26, 2: 24, 3: 10, 4: 8, 5: 6, 6: 10, 7: 11, 8: 10, 9: 12, 10: 12, 11: 12, 12: 12, 13: 11, 14: 50, 15: 12})
     freeze_below(ws, header_row + 1)
 
     return {
         "sheet": ws.title,
+        "program_id_col": "O",
         "first_data_row": first_data_row,
         "last_data_row": last_data_row,
         "avg_std_lt": f"B{stat_start}",
@@ -110,4 +162,10 @@ def build(wb):
         "single_source_count": f"B{stat_start+6}",
         "alt_supplier_count": f"B{stat_start+7}",
         "high_risk_count": f"B{stat_start+8}",
+        "prg2_first_row": prg2_first_row,
+        "prg2_last_row": prg2_last_row,
+        "prg2_avg_risk_score": f"B{prg2_stat_start}",
+        "prg2_max_risk_score": f"B{prg2_stat_start+1}",
+        "prg2_single_source_count": f"B{prg2_stat_start+2}",
+        "prg2_high_risk_count": f"B{prg2_stat_start+3}",
     }

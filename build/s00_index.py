@@ -8,13 +8,14 @@ ZONE_LEGEND = [
     (3, "Orange", "Financial & Risk", "AR, cash flow, FX, scenario analysis, supply chain risk"),
     (4, "Purple", "Strategic Supply Chain", "Market analysis, network, sourcing, dual-source, negotiation, inventory, assets"),
     (5, "Red", "Execution & Control", "Gates, ECO, VDC, yield metrics, ROI tracker, scorecard, change tracker"),
+    (6, "Teal", "Portfolio & Capital Allocation", "Multi-program register, portfolio dashboard, prioritization scorecard"),
 ]
 
 DIRECTORY = [
     ("S00", "S00_Index", 0, "New", "Workbook navigation, zone guide, sheet directory", "This page"),
     ("S01", "S01_Disclaimer_Assumptions", 0, "Revised", "Portfolio disclaimer, global model assumptions, version control", "WACC=8%, Uptime=92%, FX rates, version log"),
-    ("S02", "S02_Equipment_Portfolio", 1, "Revised", "Master equipment dataset — 15 platforms, costs, energy, throughput", "$13.87M CapEx, 45 units, $418K/yr energy"),
-    ("S03", "S03_Supplier_Dataset", 1, "Revised", "Supplier lead times, reliability scores, risk tiers for all 15 OEMs", "Avg LT 20.4 wks, 8 HIGH risk suppliers"),
+    ("S02", "S02_Equipment_Portfolio", 1, "Revised", "Master equipment dataset for 2 programs (PRG-001, PRG-002) — costs, energy, throughput", "$13.87M + $2.38M CapEx across 21 platforms"),
+    ("S03", "S03_Supplier_Dataset", 1, "Revised", "Supplier lead times, reliability scores, risk tiers across both programs", "21 OEMs; Program ID column for portfolio rollups"),
     ("S04", "S04_Should_Cost_Model", 1, "Preserved", "First-principles should-cost by material, labour, OH, margin", "Should-cost vs quote variance analysis"),
     ("S05", "S05_TCO_Downtime_Model", 1, "Preserved", "10-year TCO, energy, maintenance, downtime cost comparison", "NPV-based lifecycle cost comparison"),
     ("S06", "S06_WBS", 2, "New", "Work Breakdown Structure — all program workstreams and tasks", "8 workstreams, 60+ work packages"),
@@ -27,7 +28,7 @@ DIRECTORY = [
     ("S13", "S13_Scenario_Analysis", 3, "Revised", "Scenario A/B/C comparison — CapEx, OpEx, NPV tradeoffs", "Scenario B recommended; $40.04M benchmark"),
     ("S14", "S14_CashFlow_Model", 3, "New", "Merged monthly + quarterly cash flow with S-curve profile", "$14.42M program spend; compressed to 2025"),
     ("S15", "S15_FX_Exposure_Model", 3, "Revised", "EUR/JPY FX risk — baseline, adverse, favorable scenarios", "9/10 line items hedged"),
-    ("S16", "S16_Supply_Chain_Risk", 3, "Revised", "Supply chain risk heatmap — 19 components, 4 risk tiers", "7 CRITICAL; 4 HIGH; single-source analysis"),
+    ("S16", "S16_Supply_Chain_Risk", 3, "Revised", "Supply chain risk heatmap — 25 components across both programs, 4 risk tiers", "7 CRITICAL; 4 HIGH; single-source analysis"),
     ("S17", "S17_Supply_Market_Analysis", 4, "New", "Supply market structure — concentration, players, pricing trends", "8 commodities; HHI analysis; price trends"),
     ("S18", "S18_Supply_Chain_Network", 4, "New", "Logistics network map — supplier geography, routes, Tier 2 visibility", "15 suppliers; transit times; customs data"),
     ("S19", "S19_Strategic_Sourcing_Pipeline", 4, "New", "Full sourcing workflow — RFI to award, contract status, savings", "12 categories tracked"),
@@ -44,6 +45,9 @@ DIRECTORY = [
     ("S30", "S30_Executive_Dashboard", 0, "Revised", "Executive KPI summary — all zones linked, recruiter first view", "All key metrics; zone navigation prompts"),
     ("S31", "S31_Vendor_Scorecard", 5, "New", "Weighted vendor scorecard — delivery, quality, commercial, technical", "18 suppliers scored; 4 Preferred, 9 Approved"),
     ("S32", "S32_Change_Tracker", 5, "New", "Engineering change management log — cost, schedule, risk", "12 CRs; $210.5K cost impact; 5.8% contingency used"),
+    ("S33", "S33_Portfolio_Register", 6, "New", "Multi-program register — one row per program, live-linked financials & risk", "2 programs; PRG-001 Greenfield, PRG-002 Riverside"),
+    ("S34", "S34_Portfolio_Dashboard", 6, "New", "Portfolio-wide KPI rollup across all active/proposed programs", "Total portfolio CapEx, blended risk, program comparison"),
+    ("S35", "S35_Portfolio_Prioritization", 6, "New", "Weighted capital allocation scorecard — ranks programs for sequencing", "Greenfield #1 (4.25/5.0), Riverside #2 (3.15/5.0)"),
 ]
 
 

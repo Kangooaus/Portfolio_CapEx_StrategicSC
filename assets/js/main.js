@@ -1,6 +1,13 @@
 /* ============================================================
-   main.js — shared Chart.js defaults, palette, plugins, footer
+   main.js — shared Chart.js defaults, palette, plugins, footer,
+             portfolio project switcher
    ============================================================ */
+
+// In-site navigation that preserves the active program selection.
+// programs-data.js (loaded before this file) defines withProgramParam().
+function go(href){
+  window.location.href = (typeof withProgramParam === 'function') ? withProgramParam(href) : href;
+}
 
 // Active nav tab
 (function(){
@@ -9,6 +16,31 @@
     if(t.dataset.page===p) t.classList.add('active');
   });
 })();
+
+// Project switcher — injected into every page's nav so the selected
+// program travels with the visitor from page to page.
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof PROGRAMS === 'undefined') return;
+  const actions = document.querySelector('.nav-actions');
+  if (!actions) return;
+
+  const activeId = getActiveProgramId();
+  const wrap = document.createElement('div');
+  wrap.className = 'program-switcher';
+  wrap.innerHTML = `
+    <select id="programSwitcher" aria-label="Active program">
+      ${PORTFOLIO_ORDER.map(id => {
+        const p = PROGRAMS[id];
+        const sel = id === activeId ? 'selected' : '';
+        return `<option value="${id}" ${sel}>${p.programRef} · ${p.shortName}</option>`;
+      }).join('')}
+    </select>`;
+  actions.insertBefore(wrap, actions.firstChild);
+
+  document.getElementById('programSwitcher').addEventListener('change', (e) => {
+    setActiveProgram(e.target.value);
+  });
+});
 
 // Chart.js global defaults
 if(typeof Chart!=='undefined'){
@@ -31,7 +63,8 @@ const TIP={
   padding:10,cornerRadius:3,displayColors:true,boxWidth:8,boxHeight:8
 };
 
-// Value label plugin
+// Value label plugin (only registered on pages that load Chart.js)
+if(typeof Chart!=='undefined'){
 Chart.register({
   id:'topLabels',
   afterDatasetsDraw(chart){
@@ -56,6 +89,7 @@ Chart.register({
     });
   }
 });
+}
 
 // Inject footer
 document.addEventListener('DOMContentLoaded',()=>{

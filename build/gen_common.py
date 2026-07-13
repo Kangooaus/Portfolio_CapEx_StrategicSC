@@ -13,6 +13,7 @@ ZONE_COLORS = {
     3: "E67E22",  # Orange - Financial & Risk
     4: "6A1B9A",  # Purple - Strategic Supply Chain
     5: "C0392B",  # Red - Execution & Control
+    6: "16A085",  # Teal - Portfolio & Capital Allocation
 }
 
 ZONE_FILL_LIGHT = {
@@ -22,6 +23,7 @@ ZONE_FILL_LIGHT = {
     3: "FCE4CC",
     4: "E6D9F0",
     5: "F5D6D2",
+    6: "D2F1EA",
 }
 
 RAG_GREEN = "C6EFCE"

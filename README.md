@@ -8,9 +8,14 @@ Live site: [quantumaster007.github.io/Portfolio_CapEx_StrategicSC](https://quant
 
 ## Overview
 
-A portfolio demonstrating hands-on experience in capital equipment program management and strategic supply chain operations within advanced manufacturing environments.
+A portfolio demonstrating hands-on experience in capital equipment program management and strategic supply chain operations within advanced manufacturing environments — built as a genuine **multi-project portfolio tool**, not a single-program dashboard.
 
-The work is built around a synthetic $13.87M capital equipment programme — **Greenfield Expansion Phase II** — covering 15 equipment platforms across sourcing, logistics, execution, and financial governance. It is visualised through a static web dashboard deployed on GitHub Pages, backed by a 33-sheet Excel model.
+Two synthetic programs sit side by side under one Portfolio Director:
+
+- **Greenfield Expansion Phase II** (PRG-001) — $13.87M, 15 equipment platforms, AR-approved and in execution (G2 gate)
+- **Riverside Automation Upgrade Phase I** (PRG-002) — $2.38M (est.), 6 equipment platforms, FEL-2 feasibility, pre-AR
+
+A portfolio-wide rollup layer sits above both: total portfolio CapEx, blended risk index, and a weighted capital-allocation scorecard that ranks the two programs for sequencing. The site's project switcher (top-right on every page) and the Excel workbook's Program ID columns both key off the same two programs, so the numbers agree everywhere.
 
 > All data is synthetic and created for portfolio demonstration purposes only. It does not represent proprietary or confidential information from any employer or client.
 
@@ -18,32 +23,37 @@ The work is built around a synthetic $13.87M capital equipment programme — **G
 
 ## What This Covers
 
-The portfolio spans the full lifecycle of a capital equipment programme — from initial appropriations request through post-commissioning ROI tracking. Key areas demonstrated:
+The portfolio spans the full lifecycle of a capital equipment programme — from initial appropriations request through post-commissioning ROI tracking — **and** the portfolio-management layer that sits above multiple concurrent programmes. Key areas demonstrated:
 
 - **CapEx Governance** — AR submission, budget hierarchy, scenario analysis, cash flow modelling, and FX exposure management across a $16M appropriation
 - **Strategic Sourcing** — FEL 1–3 sourcing methodology, should-cost modelling, RFI/RFP process, commercial negotiation, and $537K in confirmed savings across 9 closed contracts
 - **Supply Chain Operations** — 15-supplier network across 5 countries, logistics lead time management, dual-source qualification, inventory and buffer planning
 - **Program Execution** — WBS, CPM critical path scheduling (46-week programme), phase-gate governance (G0–G5), milestone tracking, and engineering change management
 - **Risk & Performance** — Supply chain risk heatmap, yield/OEE tracking, vendor scorecard, asset lifecycle register, and post-commissioning ROI
+- **Portfolio Management** — multi-program register, portfolio-wide KPI rollup, and a weighted capital-allocation scorecard for sequencing programmes against each other
 
 ---
 
 ## Dashboard Pages
 
-| Page | Description |
-|---|---|
-| **Home** | Programme overview, capability summary, workbook zone architecture |
-| **Executive Dashboard** | KPIs, CapEx allocation, deployment status, capacity vs demand, programme health |
-| **Strategic Supply Chain** | Market concentration, supplier geography, negotiation savings, lead times, dual-source status |
-| **Program Execution & Risk** | WBS, CPM critical path, milestone roadmap, risk distribution, inventory coverage, asset lifecycle |
-| **Deep Dive** | Yield/OEE metrics, supplier capacity analysis, ECO register, asset snapshot, documentation |
-| **Sourcing Framework** | FEL phase map, AACE cost estimating, RFI/RFP pipeline, should-cost methodology, FID checklist |
+Every page carries a **project switcher** (top-right nav) that persists the selected program across navigation via a `?program=` query param + `localStorage`.
+
+| Page | Description | Multi-program? |
+|---|---|---|
+| **Home** | Portfolio-wide KPI rollup, program cards (click through to either program's dashboard), capability summary | ✅ Portfolio-level |
+| **Executive Dashboard** | KPIs, CapEx allocation, deployment/sourcing status, capacity vs demand or path-to-AR, programme health/readiness, milestones | ✅ Fully data-driven per program |
+| **Strategic Supply Chain** | Market concentration, supplier geography, negotiation savings, lead times, dual-source status | Greenfield Phase II |
+| **Program Execution & Risk** | WBS, CPM critical path, milestone roadmap, risk distribution, inventory coverage, asset lifecycle | Greenfield Phase II |
+| **Deep Dive** | Yield/OEE metrics, supplier capacity analysis, ECO register, asset snapshot, documentation | Greenfield Phase II |
+| **Sourcing Framework** | FEL phase map, AACE cost estimating, RFI/RFP pipeline, should-cost methodology, FID checklist | Greenfield Phase II |
+
+The Executive Dashboard is the flagship of the multi-project pattern: switch to **PRG-002 · Riverside Phase I** and the whole page adapts — deployment status becomes sourcing/qualification status, the capacity-vs-demand chart becomes a "Path to AR Approval" roadmap, and the milestone timeline becomes a "not yet in execution" notice, because that program genuinely doesn't have that data yet. The other four pages currently remain scoped to Greenfield Phase II; the same `PROGRAMS` registry in `assets/js/programs-data.js` is what you'd extend to bring them along.
 
 ---
 
 ## Excel Workbook
 
-The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **33 sheets across 6 zones**, with 1,300+ active formulas and full cross-sheet traceability. It is generated from source with the scripts in `build/` (`python3 build/build_workbook.py`), so the whole model is reproducible and auditable.
+The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **36 sheets across 7 zones**, with 1,300+ active formulas and full cross-sheet traceability. It is generated from source with the scripts in `build/` (`python3 build/build_workbook.py`), so the whole model is reproducible and auditable.
 
 | Zone | Sheets | Content |
 |---|---|---|
@@ -53,6 +63,17 @@ The workbook (`CapEx_StrategicSC_Portfolio.xlsx`) contains **33 sheets across 6 
 | Z3 — Financial & Risk | 5 | AR Summary, Cash Flow, FX Exposure, Scenario Analysis, Supply Chain Risk |
 | Z4 — Strategic Supply Chain | 8 | Market Analysis, Network Map, Sourcing Pipeline, Dual-Source Strategy, Negotiation Tracker, Supplier Capacity, Inventory Planning, Asset Tracking |
 | Z5 — Execution & Control | 7 | Milestone Gate Tracker, ECO Register, Vendor Design Changes, Yield Metrics, ROI Tracker, Vendor Scorecard, Change Tracker |
+| Z6 — Portfolio & Capital Allocation | 3 | Portfolio Register, Portfolio Dashboard, Portfolio Prioritization scorecard |
+
+### Multi-program layer (Z6)
+
+S02 (Equipment Portfolio), S03 (Supplier Dataset), and S16 (Supply Chain Risk) each carry a **Program ID** column (PRG-001 / PRG-002) and hold both programs' rows side by side. Three new sheets sit on top:
+
+- **S33_Portfolio_Register** — one row per program; financial and risk fields are live-linked back to that program's own sheets where a supporting model exists (Greenfield's full 33-sheet model), and clearly labelled as FEL-2 planning estimates where it doesn't yet (Riverside's IRR/NPV/payback).
+- **S34_Portfolio_Dashboard** — portfolio-wide KPI tiles (`SUMIFS`/`AVERAGEIFS` over the Program ID columns) plus a program-by-program comparison table. This is the sheet the site's Home page mirrors.
+- **S35_Portfolio_Prioritization** — a weighted scorecard (financial return, strategic fit, risk, schedule readiness, capital efficiency, org readiness) that ranks programs for capital-allocation sequencing, using the same weighting mechanic as S13's scenario comparison, applied program-vs-program instead of scenario-vs-scenario.
+
+To add a third program: append its equipment/supplier/risk rows to S02/S03/S16 with a new Program ID, add a row to S33, and S34/S35 pick it up automatically — no formula changes required.
 
 ---
 
@@ -71,14 +92,16 @@ Portfolio_CapEx_StrategicSC/
 │   ├── css/
 │   │   └── styles.css          → Global design system
 │   └── js/
-│       ├── main.js             → Shared utilities, Chart.js defaults, footer
-│       ├── executive.js        → Executive dashboard charts
+│       ├── programs-data.js    → Portfolio registry (both programs' data), switcher helpers, portfolio rollups
+│       ├── main.js             → Shared utilities, Chart.js defaults, footer, project switcher UI
+│       ├── home.js             → Home page portfolio KPI strip + program cards
+│       ├── executive.js        → Executive dashboard — fully data-driven per active program
 │       ├── supply-chain.js     → Supply chain charts
 │       ├── execution.js        → Execution & risk charts
 │       ├── deep-dive.js        → Deep dive charts
 │       └── sourcing.js         → Sourcing framework charts
 ├── downloads/
-│   ├── CapEx_StrategicSC_Portfolio.xlsx   → Full 33-sheet workbook (generated)
+│   ├── CapEx_StrategicSC_Portfolio.xlsx   → Full 36-sheet, 2-program workbook (generated)
 │   └── CapEx_StrategicSC_Portfolio.pdf    → Print export of the workbook
 └── build/                      → Python/openpyxl scripts that generate the .xlsx from source
     └── build_workbook.py       → Entry point: `python3 build/build_workbook.py`
