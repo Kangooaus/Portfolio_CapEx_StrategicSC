@@ -1,54 +1,5 @@
 from gen_common import *
-
-# Supplier, Component Type, Equip Ref, Region, Ccy, Std LT, Current LT, Reliability, SingleSource(Y/N), AltAvail(Y/N), Notes
-SUPPLIERS = [
-    ("Edwards Vacuum", "Dry Screw Vacuum Pumps", "EQ-001", "UK", "EUR", 14, 18, 82, "No", "Yes",
-     "Reliability impacted by post-Brexit logistics; alt vendor pre-qual in progress with Busch"),
-    ("Pfeiffer Vacuum", "Turbomolecular Pumps", "EQ-002", "DE", "EUR", 16, 26, 88, "Yes", "No",
-     "CRITICAL – single source; no qualified alternative; EQ-002 delivery risk HIGH; escalate to program director"),
-    ("Thermco Systems", "High-Temp Tube Furnaces", "EQ-003", "USA", "USD", 18, 20, 91, "No", "Yes",
-     "Preferred supplier; strong historical performance; alt supplier (BTU International) pre-qualified"),
-    ("Tokyo Electron Ltd (TEL)", "Batch Oxidation Furnaces", "EQ-004", "JP", "JPY", 20, 28, 85, "No", "Yes",
-     "JPY currency risk; FX hedge executed Q4-2024; alt: Kokusai Electric pre-qualified"),
-    ("Brooks Automation", "Wafer Transfer Robots (SCARA)", "EQ-005", "USA", "USD", 12, 14, 90, "No", "Yes",
-     "Software integration complexity is primary risk; not supply risk; support SLA confirmed"),
-    ("Daifuku", "Overhead Conveyor Track System", "EQ-006", "JP", "JPY", 22, 30, 83, "Yes", "No",
-     "Single source for overhead track design; civil interface drawings required 8 wks prior to FAT"),
-    ("Air Liquide Engineering", "Process Gas Cabinets", "EQ-007", "FR", "EUR", 16, 22, 79, "No", "Yes",
-     "Quote under negotiation; delivery risk moderate; Matheson Gas alt supplier evaluated"),
-    ("Linde Engineering", "Bulk Gas Storage & Delivery", "EQ-008", "DE", "EUR", 24, 32, 86, "No", "Yes",
-     "Long procurement cycle; requires site permit coordination; 32-wk lead time confirmed by supplier"),
-    ("Siemens AG", "Distributed Control Systems", "EQ-009", "DE", "EUR", 10, 14, 92, "No", "Yes",
-     "Strong supply reliability; cybersecurity review adds 3-wk internal approval cycle"),
-    ("Inductive Automation", "SCADA Platform Licenses", "EQ-010", "USA", "USD", 4, 5, 95, "No", "Yes",
-     "Software license only; low supply risk; primary risk is IT/OT integration complexity"),
-    ("ABB Ltd", "Dry-Type Transformers", "EQ-011", "CH", "USD", 14, 20, 87, "No", "Yes",
-     "Component partially reused from prior program; new units on 20-wk market lead time"),
-    ("Daikin Applied", "Process Chiller Systems", "EQ-012", "JP", "JPY", 16, 20, 89, "No", "Yes",
-     "Glycol loop interface drawings required prior to FAT; JPY exposure monitored"),
-    ("Busch Vacuum", "Roots Blower Boosters", "EQ-013", "DE", "EUR", 12, 15, 88, "No", "Yes",
-     "Paired supply with Edwards EQ-001; coordinated delivery schedule required"),
-    ("Applied Materials", "Rapid Thermal Processors (RTP)", "EQ-014", "USA", "USD", 20, 24, 90, "No", "Yes",
-     "Highest value item; supplier requires 30% deposit at PO; finance pre-approval required"),
-    ("Mobile Industrial Robots (MiR)", "AMR Fleet – 10 Units", "EQ-015", "DK", "EUR", 14, 18, 84, "No", "Yes",
-     "Fleet SW license bundled; Wi-Fi site survey required 6 wks pre-installation"),
-]
-
-# Program 2 — Riverside Automation Upgrade Phase I (PRG-002)
-SUPPLIERS_PRG2 = [
-    ("Fanuc America", "Palletizing Robots", "RV-001", "USA", "USD", 10, 12, 91, "No", "Yes",
-     "Deep bench of qualified integrators; low supply risk; standard robot platform"),
-    ("Krones AG", "Case Packer / Cartoning Systems", "RV-002", "DE", "EUR", 20, 24, 86, "Yes", "No",
-     "Single-source specialized cartoning technology; no qualified alternative identified"),
-    ("Fetch Robotics", "AGV Fleet Units", "RV-003", "USA", "USD", 8, 9, 93, "No", "Yes",
-     "Mature AGV platform; Locus Robotics evaluated as viable alternate"),
-    ("Cognex Corporation", "Vision Inspection Systems", "RV-004", "USA", "USD", 6, 7, 95, "No", "Yes",
-     "Commodity machine-vision hardware; Keyence pre-qualified as alternate"),
-    ("Rockwell Automation", "Warehouse Control System", "RV-005", "USA", "USD", 8, 9, 94, "No", "Yes",
-     "Strong integrator relationship; low supply risk; standard PlantPAx platform"),
-    ("Dematic Corp", "Conveyor & Sortation Systems", "RV-006", "USA", "USD", 16, 20, 88, "No", "Yes",
-     "Complex site-specific integration; Honeywell Intelligrated evaluated as alternate"),
-]
+import db
 
 HEADERS = ["Supplier", "Component Type", "Equip. Ref", "Region", "Ccy", "Std LT (wks)",
            "Current LT (wks)", "LT Delta (wks)", "Reliability (0-100)", "Single Source Risk",
@@ -56,8 +7,14 @@ HEADERS = ["Supplier", "Component Type", "Equip. Ref", "Region", "Ccy", "Std LT 
 
 
 def _write_supplier_rows(ws, r, rows, program_id):
+    """rows: list of dicts from db.list_suppliers()."""
     for s in rows:
-        (sup, comp, eqref, region, ccy, stdlt, curlt, rel, single, alt, notes) = s
+        sup, comp, eqref = s["supplier_name"], s["component_type"], s["equip_ref"]
+        region, ccy = s["region"], s["currency"]
+        stdlt, curlt, rel = s["std_lt_wks"], s["current_lt_wks"], s["reliability"]
+        single = "Yes" if s["single_source"] else "No"
+        alt = "Yes" if s["alt_supplier_available"] else "No"
+        notes = s["notes"]
         ws.cell(row=r, column=1, value=sup).font = BLUE_INPUT
         ws.cell(row=r, column=2, value=comp).font = BLUE_INPUT
         ws.cell(row=r, column=3, value=eqref).font = BLUE_INPUT
@@ -94,7 +51,7 @@ def build(wb):
     header_row = write_headers(ws, row, 1, HEADERS, 1)
     first_data_row = header_row
     r = header_row
-    r = _write_supplier_rows(ws, r, SUPPLIERS, "PRG-001")
+    r = _write_supplier_rows(ws, r, db.list_suppliers(program_ref="PRG-001"), "PRG-001")
     last_data_row = r - 1
 
     row = r + 1
@@ -125,7 +82,7 @@ def build(wb):
     prg2_header_row = write_headers(ws, row, 1, HEADERS, 1)
     prg2_first_row = prg2_header_row
     r = prg2_header_row
-    r = _write_supplier_rows(ws, r, SUPPLIERS_PRG2, "PRG-002")
+    r = _write_supplier_rows(ws, r, db.list_suppliers(program_ref="PRG-002"), "PRG-002")
     prg2_last_row = r - 1
     row = r + 1
 

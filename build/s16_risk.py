@@ -1,63 +1,6 @@
 from gen_common import *
 from openpyxl.formatting.rule import CellIsRule
-
-# EquipRef, Supplier, Component, StdLT, CurLT, DelayProb, SchedImpact, ReplaceDiff, SingleSource, Buffer, Mitigation, Status
-RISK_ITEMS = [
-    ("EQ-001", "Edwards Vacuum", "Dry Screw Pump – Complete Unit", 14, 18, 0.35, 3, 2, "No", "No",
-     "Expedite order; confirm delivery schedule with supplier weekly; pre-qualify Busch as alt", "IN PROGRESS"),
-    ("EQ-002", "Pfeiffer Vacuum", "Turbomolecular Pump – Complete Unit", 16, 26, 0.55, 5, 5, "YES", "No",
-     "CRITICAL PATH: Escalate to VP Supply Chain; evaluate rebuilt unit as bridge; initiate alt vendor qual", "ESCALATED"),
-    ("EQ-002", "Pfeiffer Vacuum", "Turbomolecular Controller Electronics", 12, 18, 0.45, 4, 5, "YES", "No",
-     "Controller firmware proprietary; no drop-in alt; request safety stock commitment from supplier", "ESCALATED"),
-    ("EQ-003", "Thermco Systems", "Tube Furnace – Hot Zone Assembly", 18, 20, 0.20, 4, 3, "No", "No",
-     "BTU International validated as alt; maintain contact; include alt option in RFQ", "MONITORED"),
-    ("EQ-003", "Thermco Systems", "8-Zone Heating Element Set", 10, 12, 0.15, 3, 2, "No", "Yes",
-     "2-set buffer stock maintained; supplier reliability high; no immediate action required", "OK"),
-    ("EQ-004", "Tokyo Electron (TEL)", "Batch Furnace – Complete System", 20, 28, 0.40, 5, 4, "No", "No",
-     "JPY FX hedge confirmed; increase FAT scope to 3 weeks; dedicated TEL PM assigned", "IN PROGRESS"),
-    ("EQ-004", "Tokyo Electron (TEL)", "Process Recipe Transfer Package", None, None, 0.30, 4, 4, "YES", "No",
-     "Non-tangible risk: recipe IP held by TEL; require contractual data transfer clause at PO stage", "LEGAL REVIEW"),
-    ("EQ-005", "Brooks Automation", "SCARA Robot – Mechanical Assembly", 12, 14, 0.15, 3, 3, "No", "No",
-     "Brooks delivery historically reliable; no action required; standard monitoring", "OK"),
-    ("EQ-005", "Brooks Automation", "MES Software Integration Module", None, None, 0.45, 4, 4, "YES", "No",
-     "Integration complexity risk — not supply risk; assign Brooks SW engineer on-site 4 wks pre-FAT", "IN PROGRESS"),
-    ("EQ-006", "Daifuku", "Overhead Track System – Civil Interface", 22, 30, 0.50, 4, 5, "YES", "No",
-     "Civil drawings required 8 wks pre-install; freeze layout by Week 6; no alt track supplier", "ESCALATED"),
-    ("EQ-007", "Air Liquide Eng.", "Gas Cabinet – Complete Assembly", 16, 22, 0.40, 3, 3, "No", "No",
-     "Quote under negotiation; delay increases if PO not placed by target date; expedite sourcing decision", "IN PROGRESS"),
-    ("EQ-007", "Air Liquide Eng.", "Hazmat Permit – Regulatory", None, None, 0.35, 5, 5, "YES", "No",
-     "Permit lead time 8-12 wks; submit application immediately; failure impacts entire gas system install", "ACTION REQ'D"),
-    ("EQ-008", "Linde Engineering", "Bulk Gas Storage Vessel", 24, 32, 0.35, 4, 3, "No", "No",
-     "Long-lead vessel; PO must be placed by program Week 4; civil pad work parallel path", "IN PROGRESS"),
-    ("EQ-009", "Siemens AG", "S7-1500 PLC Hardware Set", 10, 14, 0.15, 2, 2, "No", "Yes",
-     "Strong supply reliability; buffer stock of 1 spare CPU maintained; low risk", "OK"),
-    ("EQ-009", "Siemens AG", "Cybersecurity Compliance Review", None, None, 0.25, 3, 3, "YES", "No",
-     "Internal InfoSec review adds 3 wks; submit documentation package 6 wks pre-installation", "IN PROGRESS"),
-    ("EQ-011", "ABB Ltd", "2 MVA Dry-Type Transformer", 14, 20, 0.25, 4, 3, "No", "No",
-     "Reuse of legacy unit partially mitigates; new unit on order; monitor delivery", "MONITORED"),
-    ("EQ-012", "Daikin Applied", "Chiller – Complete Package", 16, 20, 0.20, 3, 2, "No", "No",
-     "Glycol loop interface design must be finalized prior to FAT; coordinate with mechanical team", "IN PROGRESS"),
-    ("EQ-014", "Applied Materials", "RTP Tool – Complete System", 20, 24, 0.25, 5, 4, "No", "No",
-     "Highest-value item; AMAT requires 30% deposit at PO; finance pre-approval gate required", "ACTION REQ'D"),
-    ("EQ-015", "MiR (Mobile Industrial Robots)", "AMR Fleet – 10 Units", 14, 18, 0.30, 2, 2, "No", "No",
-     "Wi-Fi infrastructure survey required 6 wks pre-delivery; coordinate with IT/OT team", "MONITORED"),
-]
-
-# Program 2 — Riverside Automation Upgrade Phase I (PRG-002)
-RISK_ITEMS_PRG2 = [
-    ("RV-001", "Fanuc America", "Palletizing Robot – Complete Unit", 10, 12, 0.15, 2, 2, "No", "No",
-     "Standard robot platform; low risk; monitor delivery per standard cadence", "OK"),
-    ("RV-002", "Krones AG", "Cartoning System – Complete Unit", 20, 24, 0.30, 4, 4, "YES", "No",
-     "Single-source specialized tech; no qualified alt; monitor delivery weekly during build", "IN PROGRESS"),
-    ("RV-003", "Fetch Robotics", "AGV Fleet – Complete Units", 8, 9, 0.10, 2, 1, "No", "No",
-     "Mature platform; low supply risk; standard monitoring", "OK"),
-    ("RV-004", "Cognex Corporation", "Vision Inspection – Complete Units", 6, 7, 0.10, 2, 1, "No", "Yes",
-     "Commodity vision hardware; Keyence pre-qualified alt on file", "OK"),
-    ("RV-005", "Rockwell Automation", "WCS Integration – Software/Hardware", 8, 9, 0.20, 3, 2, "No", "No",
-     "Standard PlantPAx platform; integrator has strong track record", "MONITORED"),
-    ("RV-006", "Dematic Corp", "Conveyor & Sortation – Complete System", 16, 20, 0.25, 3, 3, "No", "No",
-     "Complex site-specific integration; phased cutover plan mitigates schedule risk", "MONITORED"),
-]
+import db
 
 HEADERS = ["Equip Ref", "Supplier", "Component / Sub-System", "Std Lead (wks)", "Current Lead (wks)",
            "Delay Prob. (0-1)", "Sched. Impact (1-5)", "Replace Difficulty (1-5)", "Composite Risk Score",
@@ -65,7 +8,14 @@ HEADERS = ["Equip Ref", "Supplier", "Component / Sub-System", "Std Lead (wks)", 
 
 
 def _write_risk_rows(ws, r, rows, program_id):
-    for (eq, sup, comp, stdlt, curlt, prob, sched, repl, single, buf, mit, status) in rows:
+    """rows: list of dicts from db.list_risk_items()."""
+    for ri in rows:
+        eq, sup, comp = ri["equip_ref"], ri["supplier"], ri["component"]
+        stdlt, curlt = ri["std_lead"], ri["current_lead"]
+        prob, sched, repl = ri["delay_prob"], ri["sched_impact"], ri["replace_difficulty"]
+        single = "YES" if ri["single_source"] else "No"
+        buf = "Yes" if ri["buffer_stock"] else "No"
+        mit, status = ri["mitigation"], ri["status"]
         ws.cell(row=r, column=1, value=eq)
         ws.cell(row=r, column=2, value=sup)
         ws.cell(row=r, column=3, value=comp)
@@ -126,7 +76,7 @@ def build(wb):
     header_row = write_headers(ws, row, 1, HEADERS, 3)
     first_row = header_row
     r = header_row
-    r = _write_risk_rows(ws, r, RISK_ITEMS, "PRG-001")
+    r = _write_risk_rows(ws, r, db.list_risk_items(program_ref="PRG-001"), "PRG-001")
     last_row = r - 1
     row = r + 2
 
@@ -167,7 +117,7 @@ def build(wb):
     prg2_header_row = write_headers(ws, row, 1, HEADERS, 3)
     prg2_first_row = prg2_header_row
     r = prg2_header_row
-    r = _write_risk_rows(ws, r, RISK_ITEMS_PRG2, "PRG-002")
+    r = _write_risk_rows(ws, r, db.list_risk_items(program_ref="PRG-002"), "PRG-002")
     prg2_last_row = r - 1
     row = r + 1
 

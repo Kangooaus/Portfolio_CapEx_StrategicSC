@@ -195,6 +195,8 @@ RISK_ITEMS_PRG2 = [
 ]
 
 # (section, parameter, value, unit, source, date_validated, notes)
+# `value` may be a number (stored in assumptions.value) or a string (stored in
+# assumptions.value_text) — seed() below routes each to the right column.
 ASSUMPTIONS = [
     ("ENERGY & UTILITIES", "Energy Price – Electricity", 0.110, "USD/kWh", "EIA Industrial Rate Survey – US Avg 2024", "2025-01",
      "Used in Annual Energy Cost calculations across S02, S05 TCO model"),
@@ -210,6 +212,8 @@ ASSUMPTIONS = [
      "All TCO and NPV models use 10-year horizon"),
     ("FINANCIAL & DISCOUNT ASSUMPTIONS", "Tax Rate (Effective)", 0.21, "—", "US Federal + State blended estimate", "2025-01",
      "Applied in AR payback model for after-tax IRR"),
+    ("FINANCIAL & DISCOUNT ASSUMPTIONS", "CapEx Depreciation Method", "MACRS 7-yr", "—", "Finance / Tax Counsel guidance", "2025-01",
+     "Per AR Summary financial justification"),
     ("FINANCIAL & DISCOUNT ASSUMPTIONS", "Inflation Rate", 0.025, "—", "Corporate finance planning assumption", "2025-01",
      "Used to escalate Year 2-10 OpEx in TCO model"),
     ("LABOR RATES", "Fabrication Shop Rate", 95.00, "USD/hr", "Supplier benchmarking; 2024 MW industrial rate", "2025-01",
@@ -313,9 +317,11 @@ def seed():
 
     conn.execute("DELETE FROM assumptions")
     for i, a in enumerate(ASSUMPTIONS):
-        db.upsert_assumption(dict(zip(
-            ["section", "parameter", "value", "unit", "source", "date_validated", "notes"], a),
-            program_ref=None, sort_order=i), conn=conn)
+        row = dict(zip(["section", "parameter", "value", "unit", "source", "date_validated", "notes"], a))
+        if isinstance(row["value"], str):
+            row["value_text"] = row["value"]
+            row["value"] = None
+        db.upsert_assumption(dict(row, program_ref=None, sort_order=i), conn=conn)
 
     conn.commit()
     conn.close()

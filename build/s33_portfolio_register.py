@@ -1,4 +1,7 @@
 from gen_common import *
+import db
+
+_STATUS_FILL = {"st-green": RAG_GREEN, "st-amber": RAG_AMBER, "st-red": RAG_RED}
 
 
 def build(wb, s02, s03, s16, s12):
@@ -20,21 +23,24 @@ def build(wb, s02, s03, s16, s12):
     first_row = header_row
     r = header_row
 
+    prg1 = db.get_program("PRG-001")
+    prg2 = db.get_program("PRG-002")
+
     # --- PRG-001: Greenfield Expansion Phase II (fully linked to its live model) ---
-    ws.cell(row=r, column=1, value="PRG-001").font = BOLD
-    ws.cell(row=r, column=2, value="Greenfield Expansion Phase II")
-    ws.cell(row=r, column=3, value="Sourabh Tarodekar (Portfolio Director)")
-    ws.cell(row=r, column=4, value="Sourabh Tarodekar")
-    ws.cell(row=r, column=5, value="Semiconductor & Advanced Process Division")
-    ws.cell(row=r, column=6, value="G2 — Equipment Build & FAT (Execution)")
-    stc = ws.cell(row=r, column=7, value="APPROVED — IN EXECUTION")
-    stc.fill = PatternFill("solid", fgColor=RAG_GREEN)
+    ws.cell(row=r, column=1, value=prg1["program_ref"]).font = BOLD
+    ws.cell(row=r, column=2, value=prg1["name"])
+    ws.cell(row=r, column=3, value=prg1["sponsor"])
+    ws.cell(row=r, column=4, value=prg1["program_manager"])
+    ws.cell(row=r, column=5, value=prg1["business_unit"])
+    ws.cell(row=r, column=6, value=prg1["phase"])
+    stc = ws.cell(row=r, column=7, value=prg1["status"])
+    stc.fill = PatternFill("solid", fgColor=_STATUS_FILL.get(prg1["phase_tag_class"], RAG_GREEN))
     capex1 = ws.cell(row=r, column=8, value=f"={q(s02['sheet'], s02['total_capex_cell'])}"); capex1.number_format = USD0; capex1.font = GREEN_LINK
     cont1 = ws.cell(row=r, column=9, value=f"={q(s12['sheet'], s12['contingency_cell'])}"); cont1.number_format = USD0; cont1.font = GREEN_LINK
     bud1 = ws.cell(row=r, column=10, value=f"={q(s12['sheet'], s12['total_ar_cell'])}"); bud1.number_format = USD0; bud1.font = GREEN_LINK
     irr1 = ws.cell(row=r, column=11, value=f"={q(s12['sheet'], s12['irr_cell'])}"); irr1.number_format = PCT1; irr1.font = GREEN_LINK
     npv1 = ws.cell(row=r, column=12, value=f"={q(s12['sheet'], s12['npv_cell'])}"); npv1.number_format = USD0; npv1.font = GREEN_LINK
-    ws.cell(row=r, column=13, value=4.2).font = BLUE_INPUT
+    ws.cell(row=r, column=13, value=prg1["payback_yrs"]).font = BLUE_INPUT
     risk1 = ws.cell(row=r, column=14, value=f"={q(s16['sheet'], s16['prg1_avg_risk_cell'])}"); risk1.number_format = CUR2; risk1.font = GREEN_LINK
     plat1 = ws.cell(row=r, column=15, value=f"={q(s02['sheet'], s02['num_platforms_cell'])}"); plat1.font = GREEN_LINK
     ws.cell(row=r, column=16, value="+312,000 units/yr (35% customer volume increase)").alignment = LEFT_WRAP
@@ -45,25 +51,25 @@ def build(wb, s02, s03, s16, s12):
     r += 1
 
     # --- PRG-002: Riverside Automation Upgrade Phase I (lighter model — estimate-level financials) ---
-    ws.cell(row=r, column=1, value="PRG-002").font = BOLD
-    ws.cell(row=r, column=2, value="Riverside Automation Upgrade Phase I")
-    ws.cell(row=r, column=3, value="Sourabh Tarodekar (Portfolio Director)")
-    ws.cell(row=r, column=4, value="Elena Vargas")
-    ws.cell(row=r, column=5, value="Packaging & Distribution Operations")
-    ws.cell(row=r, column=6, value="FEL-2 — Feasibility (Pre-Execution)")
-    stc2 = ws.cell(row=r, column=7, value="PROPOSED — AWAITING AR APPROVAL")
-    stc2.fill = PatternFill("solid", fgColor=RAG_AMBER)
+    ws.cell(row=r, column=1, value=prg2["program_ref"]).font = BOLD
+    ws.cell(row=r, column=2, value=prg2["name"])
+    ws.cell(row=r, column=3, value=prg2["sponsor"])
+    ws.cell(row=r, column=4, value=prg2["program_manager"])
+    ws.cell(row=r, column=5, value=prg2["business_unit"])
+    ws.cell(row=r, column=6, value=prg2["phase"])
+    stc2 = ws.cell(row=r, column=7, value=prg2["status"])
+    stc2.fill = PatternFill("solid", fgColor=_STATUS_FILL.get(prg2["phase_tag_class"], RAG_AMBER))
     capex2 = ws.cell(row=r, column=8,
                       value=f"={q(s02['sheet'], s02['prg2_total_equip_cell'])}+{q(s02['sheet'], s02['prg2_total_install_cell'])}")
     capex2.number_format = USD0
     capex2.font = GREEN_LINK
     cont2 = ws.cell(row=r, column=9, value=f"=H{r}*0.10"); cont2.number_format = USD0
-    fx2 = 42000
-    nre2 = 95000
+    fx2 = prg2["fx_reserve"]
+    nre2 = prg2["nre"]
     bud2 = ws.cell(row=r, column=10, value=f"=H{r}+I{r}+{fx2}+{nre2}"); bud2.number_format = USD0
-    irr2 = ws.cell(row=r, column=11, value=0.168); irr2.number_format = PCT1; irr2.font = BLUE_INPUT
-    npv2 = ws.cell(row=r, column=12, value=1850000); npv2.number_format = USD0; npv2.font = BLUE_INPUT
-    ws.cell(row=r, column=13, value=3.1).font = BLUE_INPUT
+    irr2 = ws.cell(row=r, column=11, value=prg2["irr"]); irr2.number_format = PCT1; irr2.font = BLUE_INPUT
+    npv2 = ws.cell(row=r, column=12, value=prg2["npv"]); npv2.number_format = USD0; npv2.font = BLUE_INPUT
+    ws.cell(row=r, column=13, value=prg2["payback_yrs"]).font = BLUE_INPUT
     risk2 = ws.cell(row=r, column=14, value=f"={q(s16['sheet'], s16['prg2_avg_risk_cell'])}"); risk2.number_format = CUR2; risk2.font = GREEN_LINK
     plat2 = ws.cell(row=r, column=15, value=f"=COUNTA({q(s02['sheet'], 'A' + str(s02['prg2_first_row']))}:{q(s02['sheet'], 'A' + str(s02['prg2_last_row']))})")
     plat2.font = GREEN_LINK

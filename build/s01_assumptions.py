@@ -1,5 +1,6 @@
 from gen_common import *
 from openpyxl.styles import Font
+import db
 
 
 def build(wb):
@@ -22,94 +23,15 @@ def build(wb):
 
     headers = ["Parameter", "Value", "Unit", "Source / Basis", "Date Validated", "Notes"]
 
-    sections = [
-        ("ENERGY & UTILITIES", [
-            ("Energy Price – Electricity", 0.110, "USD/kWh", "EIA Industrial Rate Survey – US Avg 2024", "2025-01",
-             "Used in Annual Energy Cost calculations across S02, S05 TCO model"),
-            ("Natural Gas Price", 4.800, "USD/MMBtu", "EIA Natural Gas Industrial Price – 2024", "2025-01",
-             "Used for high-temp furnace operating cost estimation"),
-            ("Cooling Water Cost", 0.018, "USD/gallon", "Site Utility Rate Schedule Rev C", "2025-01",
-             "Applicable to chiller and process cooling loads"),
-            ("N2 Bulk Gas Cost", 0.045, "USD/scf", "Site Utility Rate Schedule Rev C", "2025-01",
-             "Applicable to gas handling system operating cost"),
-        ]),
-        ("FINANCIAL & DISCOUNT ASSUMPTIONS", [
-            ("Discount Rate (WACC)", 0.08, "—", "Finance Department; WACC model approved Q4-2024", "2025-01",
-             "Used in NPV calculations; 8% reflects blended cost of capital"),
-            ("Project Horizon", 10, "Years", "Standard CapEx lifecycle policy", "2025-01",
-             "All TCO and NPV models use 10-year horizon"),
-            ("Tax Rate (Effective)", 0.21, "—", "US Federal + State blended estimate", "2025-01",
-             "Applied in AR payback model for after-tax IRR"),
-            ("CapEx Depreciation Method", "MACRS 7-yr", "—", "Finance / Tax Counsel guidance", "2025-01",
-             "Per AR Summary financial justification"),
-            ("Inflation Rate", 0.025, "—", "Corporate finance planning assumption", "2025-01",
-             "Used to escalate Year 2-10 OpEx in TCO model"),
-        ]),
-        ("LABOR RATES", [
-            ("Fabrication Shop Rate", 95.00, "USD/hr", "Supplier benchmarking; 2024 MW industrial rate", "2025-01",
-             "Used in Should-Cost labor model (S04)"),
-            ("Engineering Labor Rate", 120.00, "USD/hr", "Internal engineering rate card Rev 2024", "2025-01",
-             "Used in NRE and program labor estimates"),
-            ("Installation Labor Rate", 85.00, "USD/hr", "Facilities contractor rate card", "2025-01",
-             "Used in on-site installation cost estimates"),
-            ("Field Service Rate (Supplier)", 175.00, "USD/hr", "Supplier FSE rate benchmark", "2025-01",
-             "Used in downtime / MTTR cost modelling"),
-        ]),
-        ("EQUIPMENT PERFORMANCE", [
-            ("Equipment Uptime Target", 0.92, "—", "Program engineering specification", "2025-01",
-             "92% uptime = 608 downtime hrs/yr basis for MTBF model"),
-            ("Planned Maintenance Downtime", 0.04, "—", "Maintenance planning schedule", "2025-01",
-             "4% of annual hours allocated to preventive maintenance"),
-            ("Process Yield Assumption", 0.96, "—", "Engineering process spec", "2025-01",
-             "Used in capacity model to calculate effective throughput"),
-            ("Production Value per Hour", 4500.00, "USD/hr", "Finance — fully-loaded production cost model", "2025-01",
-             "Downtime Cost = Value/hr × MTTR hrs"),
-        ]),
-        ("SUPPLIER COST MODEL INPUTS", [
-            ("Supplier Margin – Low", 0.15, "—", "Benchmarking; competitive-bid suppliers", "2025-01",
-             "Lower bound; applied to multi-source components"),
-            ("Supplier Margin – High", 0.25, "—", "Benchmarking; sole-source suppliers", "2025-01",
-             "Upper bound; applied to single-source components"),
-            ("Material Scrap Factor – Low", 0.05, "—", "Engineering; precision machined parts", "2025-01",
-             "5% scrap on raw material purchases"),
-            ("Material Scrap Factor – High", 0.08, "—", "Engineering; cast / welded assemblies", "2025-01",
-             "8% scrap on complex fabrications"),
-            ("Material Price – Steel (304 SS)", 3.800, "USD/kg", "Metal bulletin Q1-2025", "2025-01",
-             "Used in vacuum chamber and furnace body cost estimates"),
-            ("Material Price – Aluminum", 4.200, "USD/kg", "Metal bulletin Q1-2025", "2025-01",
-             "Used in robotics frame and structural components"),
-            ("Material Price – Copper", 9.500, "USD/kg", "COMEX spot Q1-2025", "2025-01",
-             "Used in transformer winding and electrical bus cost estimates"),
-        ]),
-        ("DEPLOYMENT TIMELINE ASSUMPTIONS", [
-            ("Supplier Manufacturing Duration", 20, "Weeks", "Program schedule baseline Rev 1.0", "2025-01",
-             "Range: 16–24 wks depending on equipment complexity"),
-            ("Factory Acceptance Testing (FAT)", 2, "Weeks", "Standard FAT protocol – all equipment", "2025-01",
-             "2 weeks minimum; may extend for complex systems"),
-            ("International Shipping Duration", 3, "Weeks", "Freight forwarder estimate; ocean freight", "2025-01",
-             "Air freight contingency +50% cost; used for risk scenario"),
-            ("On-Site Installation", 4, "Weeks", "Facilities project plan Rev A", "2025-01",
-             "Per equipment platform; parallel installation possible"),
-            ("Utility Hookup", 2, "Weeks", "Facilities electrical + mechanical schedule", "2025-01",
-             "Includes inspection and commissioning sign-off"),
-            ("Process Qualification (PQ)", 5, "Weeks", "Process engineering qualification plan", "2025-01",
-             "Range: 4–6 wks; 5 wks used as baseline"),
-        ]),
-        ("FX SENSITIVITY ASSUMPTIONS", [
-            ("USD/EUR Exchange Rate (Baseline)", 1.09, "USD per EUR", "Bloomberg rates Q1-2025 average", "2025-01",
-             "Baseline conversion rate for EUR-denominated equipment"),
-            ("USD/JPY Exchange Rate (Baseline)", 149.5, "JPY per USD", "Bloomberg rates Q1-2025 average", "2025-01",
-             "Baseline conversion rate for JPY-denominated equipment"),
-            ("EUR Sensitivity – Adverse", 1.15, "USD per EUR", "FX stress scenario +6%", "2025-01",
-             "1% move in EUR/USD = ~$85K portfolio cost impact"),
-            ("EUR Sensitivity – Favorable", 1.03, "USD per EUR", "FX stress scenario -6%", "2025-01",
-             "Favorable scenario used in S13 Scenario Analysis"),
-            ("JPY Sensitivity – Adverse", 142.00, "JPY per USD", "FX stress scenario (JPY strengthens)", "2025-01",
-             "Stronger JPY = higher USD cost for JPY equipment"),
-            ("JPY Sensitivity – Favorable", 157.00, "JPY per USD", "FX stress scenario (JPY weakens)", "2025-01",
-             "Weaker JPY = lower USD cost for JPY equipment"),
-        ]),
-    ]
+    assumption_rows = db.list_assumptions()
+    sections = []
+    for arow in assumption_rows:
+        val = arow["value"] if arow["value"] is not None else arow["value_text"]
+        tup = (arow["parameter"], val, arow["unit"], arow["source"], arow["date_validated"], arow["notes"])
+        if sections and sections[-1][0] == arow["section"]:
+            sections[-1][1].append(tup)
+        else:
+            sections.append((arow["section"], [tup]))
 
     # remember key cell locations for named ranges
     named = {}
